@@ -1,0 +1,1 @@
+<img src="{{ asset('assets/logo/logo-00.png') }}" alt="TP Analytics Logo" {{ $attributes }}>
