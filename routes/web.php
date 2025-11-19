@@ -10,23 +10,25 @@ Route::get('/', function () {
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'check.authorized.access'])
     ->name('dashboard');
 
 Route::view('user-analytics', 'user-analytics')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'check.authorized.access'])
     ->name('user-analytics');
 
 Route::view('transactions', 'transactions')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'check.authorized.access'])
     ->name('transactions');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'check.authorized.access'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');
-    Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+    Volt::route('settings/authorized-emails', 'settings.authorized-emails')
+        ->middleware('can:manage-authorized-emails')
+        ->name('authorized-emails.edit');
 
     Volt::route('settings/two-factor', 'settings.two-factor')
         ->middleware(
