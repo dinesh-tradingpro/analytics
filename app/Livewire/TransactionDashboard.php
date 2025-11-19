@@ -12,6 +12,8 @@ class TransactionDashboard extends Component
 
     public $showTopTransactions = true;
 
+    public $error = null;
+
     public function mount()
     {
         // Check if we have fresh data, if not suggest sync
@@ -19,6 +21,30 @@ class TransactionDashboard extends Component
         if (! $hasRecentData) {
             session()->flash('sync_needed', 'Transaction data is stale or missing. Consider running: php artisan transactions:sync');
         }
+    }
+
+    #[Computed]
+    public function depositsApproved()
+    {
+        return TransactionAnalyticsCache::getAnalyticsData('deposit', 'approved', $this->selectedPeriod) ?? (object) ['total_count' => 0, 'total_amount' => 0];
+    }
+
+    #[Computed]
+    public function depositsDeclined()
+    {
+        return TransactionAnalyticsCache::getAnalyticsData('deposit', 'declined', $this->selectedPeriod) ?? (object) ['total_count' => 0, 'total_amount' => 0];
+    }
+
+    #[Computed]
+    public function withdrawalsApproved()
+    {
+        return TransactionAnalyticsCache::getAnalyticsData('withdrawal', 'approved', $this->selectedPeriod) ?? (object) ['total_count' => 0, 'total_amount' => 0];
+    }
+
+    #[Computed]
+    public function withdrawalsDeclined()
+    {
+        return TransactionAnalyticsCache::getAnalyticsData('withdrawal', 'declined', $this->selectedPeriod) ?? (object) ['total_count' => 0, 'total_amount' => 0];
     }
 
     #[Computed]
@@ -68,10 +94,20 @@ class TransactionDashboard extends Component
         $this->showTopTransactions = ! $this->showTopTransactions;
     }
 
+    public function refreshData()
+    {
+        try {
+            $this->error = null;
+            $this->dispatch('refresh-charts');
+            session()->flash('message', 'Dashboard refreshed successfully!');
+        } catch (\Exception $e) {
+            $this->error = 'Failed to refresh data: '.$e->getMessage();
+        }
+    }
+
     public function refresh()
     {
-        $this->dispatch('refresh-charts');
-        session()->flash('message', 'Dashboard refreshed successfully!');
+        $this->refreshData();
     }
 
     private function checkForRecentData()
