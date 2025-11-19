@@ -19,6 +19,9 @@
             <flux:navlist.group :heading="__('Platform')" class="grid gap-1">
                 <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
                     wire:navigate class="px-3 py-2 text-sm">{{ __('Dashboard') }}</flux:navlist.item>
+                <flux:navlist.item icon="credit-card" :href="route('transactions')"
+                    :current="request()->routeIs('transactions')" wire:navigate class="px-3 py-2 text-sm">
+                    {{ __('Transactions') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 

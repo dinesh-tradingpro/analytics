@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class UserAnalyticsCache extends Model
 {
@@ -32,6 +32,10 @@ class UserAnalyticsCache extends Model
         'new_users' => 'new_users',
         'active_users' => 'active_users',
         'inactive_users' => 'inactive_users',
+        // New criteria-based metrics
+        'new_users_new' => 'new_users_new',
+        'active_users_new' => 'active_users_new',
+        'inactive_users_new' => 'inactive_users_new',
     ];
 
     /**

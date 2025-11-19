@@ -13,6 +13,14 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+Route::view('user-analytics', 'user-analytics')
+    ->middleware(['auth', 'verified'])
+    ->name('user-analytics');
+
+Route::view('transactions', 'transactions')
+    ->middleware(['auth', 'verified'])
+    ->name('transactions');
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
