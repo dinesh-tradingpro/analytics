@@ -1,3 +1,5 @@
+@props(['current' => ''])
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 
@@ -5,10 +7,12 @@
     @include('partials.head')
 </head>
 
-<body class="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <flux:main class="min-h-screen">
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <x-navbar :current="$current" />
+
+    <main class="min-h-screen">
         {{ $slot }}
-    </flux:main>
+    </main>
 </body>
 
 </html>
