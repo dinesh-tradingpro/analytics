@@ -69,6 +69,8 @@
             });
         });
     </script>
+
+    @fluxScripts
 </body>
 
 </html>
