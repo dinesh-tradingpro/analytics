@@ -13,6 +13,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed authorized emails first
+        $this->call(AuthorizedEmailSeeder::class);
+
         // User::factory(10)->create();
 
         User::factory()->create([

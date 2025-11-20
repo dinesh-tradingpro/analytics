@@ -47,11 +47,38 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Sync admin emails from config to database automatically
+        $this->syncAdminEmailsFromConfig();
+
         // Define gate for managing authorized emails
         Gate::define('manage-authorized-emails', function ($user) {
             $adminEmails = config('authorized_emails.admin_emails', []);
 
             return in_array($user->email, $adminEmails);
         });
+    }
+
+    /**
+     * Sync admin emails from config to authorized_emails table
+     */
+    protected function syncAdminEmailsFromConfig(): void
+    {
+        try {
+            $adminEmails = config('authorized_emails.admin_emails', []);
+
+            foreach ($adminEmails as $email) {
+                AuthorizedEmail::updateOrCreate(
+                    ['email' => $email],
+                    [
+                        'added_by_email' => 'system',
+                        'notes' => 'Admin email synced from config',
+                        'is_active' => true,
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            // Silently fail during migrations or when DB is not ready
+            // This prevents issues during fresh installations
+        }
     }
 }
