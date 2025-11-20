@@ -1,35 +1,49 @@
 @props(['current' => ''])
 
+@php
+    $icons = [
+        'dashboard' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+        'user-analytics' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+        'transactions' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+        'default' => 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6'
+    ];
+
+    $labels = [
+        'dashboard' => 'Dashboard',
+        'user-analytics' => 'Users',
+        'transactions' => 'Transactions',
+        'default' => 'Beta'
+    ];
+
+    $currentIcon = $icons[$current] ?? $icons['default'];
+    $currentLabel = $labels[$current] ?? $labels['default'];
+
+    $navItems = [
+        ['route' => route('dashboard'), 'label' => 'Dashboard', 'key' => 'dashboard'],
+        ['route' => route('user-analytics'), 'label' => 'Users', 'key' => 'user-analytics'],
+        ['route' => route('transactions'), 'label' => 'Transactions', 'key' => 'transactions']
+    ];
+
+    $menuItems = [
+        ['route' => route('profile.edit'), 'label' => 'Profile', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'],
+        ['route' => route('profile.edit'), 'label' => 'Settings', 'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z']
+    ];
+@endphp
+
 <div
     class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/20 dark:border-gray-700/30 transition-colors duration-200 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-20">
             <!-- Logo & Title -->
-            <div class="flex items-center space-x-4">
+            <a href="{{ route('home') }}"
+                class="flex items-center space-x-4 hover:opacity-80 transition-opacity duration-200">
                 <div class="relative">
                     <div
                         class="w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                        @if($current === 'dashboard')
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                        @elseif($current === 'user-analytics')
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        @elseif($current === 'transactions')
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        @else
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                        @endif
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="{{ $currentIcon }}" />
+                        </svg>
                     </div>
                     <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                 </div>
@@ -38,59 +52,51 @@
                         class="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                         TP Analytics
                     </h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                        @if($current === 'dashboard')
-                            Dashboard
-                        @elseif($current === 'user-analytics')
-                            Data
-                        @elseif($current === 'transactions')
-                            Reports
-                        @else
-                            Beta
-                        @endif
-                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">{{ $currentLabel }}</p>
                 </div>
-            </div>
+            </a>
 
             <!-- Enhanced Navigation -->
             <div class="flex items-center space-x-6">
                 @auth
                     <nav
                         class="hidden md:flex items-center space-x-2 bg-gray-50/50 dark:bg-gray-800/50 rounded-full p-1 border border-gray-200/50 dark:border-gray-700/50">
-                        <a href="{{ route('dashboard') }}" @class([
-                            'px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:shadow-md backdrop-blur-sm',
-                            'relative font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105' => $current === 'dashboard',
-                            'text-gray-700 hover:text-gray-900 hover:bg-white/60 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/60' => $current !== 'dashboard'
-                        ])>
-                            @if($current === 'dashboard')
-                                <span class="relative z-10">Dashboard</span>
-                            @else
-                                Dashboard
-                            @endif
-                        </a>
-                        <a href="{{ route('user-analytics') }}" @class([
-                            'px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:shadow-md backdrop-blur-sm',
-                            'relative font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105' => $current === 'user-analytics',
-                            'text-gray-700 hover:text-gray-900 hover:bg-white/60 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/60' => $current !== 'user-analytics'
-                        ])>
-                            @if($current === 'user-analytics')
-                                <span class="relative z-10">Data</span>
-                            @else
-                                Data
-                            @endif
-                        </a>
-                        <a href="{{ route('transactions') }}" @class([
-                            'px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:shadow-md backdrop-blur-sm',
-                            'relative font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105' => $current === 'transactions',
-                            'text-gray-700 hover:text-gray-900 hover:bg-white/60 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/60' => $current !== 'transactions'
-                        ])>
-                            @if($current === 'transactions')
-                                <span class="relative z-10">Reports</span>
-                            @else
-                                Reports
-                            @endif
-                        </a>
+                        @foreach($navItems as $item)
+                            <a href="{{ $item['route'] }}" @class([
+                                'px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:shadow-md backdrop-blur-sm',
+                                'relative font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105' => $current === $item['key'],
+                                'text-gray-700 hover:text-gray-900 hover:bg-white/60 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/60' => $current !== $item['key']
+                            ])>
+                                @if($current === $item['key'])
+                                    <span class="relative z-10">{{ $item['label'] }}</span>
+                                @else
+                                    {{ $item['label'] }}
+                                @endif
+                            </a>
+                        @endforeach
                     </nav>
+                @else
+                    <!-- Authentication Buttons for Guests -->
+                    <div class="hidden md:flex items-center space-x-3">
+                        <a href="{{ route('login') }}"
+                            class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium text-sm rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            Sign In
+                        </a>
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}"
+                                class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                </svg>
+                                Register
+                            </a>
+                        @endif
+                    </div>
                 @endauth
 
                 <!-- Theme Toggle with enhanced design -->
@@ -134,6 +140,7 @@
                             <div id="profileDropdownMenu"
                                 class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible transform scale-95 transition-all duration-200 z-50">
                                 <div class="p-2">
+                                    <!-- User Info -->
                                     <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
                                             {{ Auth::user()->name ?? 'User' }}
@@ -142,25 +149,16 @@
                                             'user@example.com' }}</p>
                                     </div>
 
-                                    <a href="{{ route('profile.edit') }}"
-                                        class="flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
-                                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                        Profile
-                                    </a>
-
-                                    <a href="{{ route('profile.edit') }}"
-                                        class="flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
-                                        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        Settings
-                                    </a>
+                                    @foreach($menuItems as $item)
+                                        <a href="{{ $item['route'] }}"
+                                            class="flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="{{ $item['icon'] }}" />
+                                            </svg>
+                                            {{ $item['label'] }}
+                                        </a>
+                                    @endforeach
 
                                     <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
 
@@ -197,27 +195,15 @@
         <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200/50 dark:border-gray-700/50 pt-4 pb-6">
             @auth
                 <nav class="flex flex-col space-y-2">
-                    <a href="{{ route('dashboard') }}" @class([
-                        'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
-                        'font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' => $current === 'dashboard',
-                        'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700' => $current !== 'dashboard'
-                    ])>
-                        Dashboard
-                    </a>
-                    <a href="{{ route('user-analytics') }}" @class([
-                        'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
-                        'font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' => $current === 'user-analytics',
-                        'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700' => $current !== 'user-analytics'
-                    ])>
-                        Data
-                    </a>
-                    <a href="{{ route('transactions') }}" @class([
-                        'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
-                        'font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' => $current === 'transactions',
-                        'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700' => $current !== 'transactions'
-                    ])>
-                        Reports
-                    </a>
+                    @foreach($navItems as $item)
+                        <a href="{{ $item['route'] }}" @class([
+                            'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
+                            'font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' => $current === $item['key'],
+                            'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700' => $current !== $item['key']
+                        ])>
+                            {{ $item['label'] }}
+                        </a>
+                    @endforeach
 
                     <!-- Mobile Profile Section -->
                     <div class="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
@@ -231,32 +217,22 @@
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ Auth::user()->name ?? 'User' }}
-                                </p>
+                                    {{ Auth::user()->name ?? 'User' }}</p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->email ??
                                     'user@example.com' }}</p>
                             </div>
                         </div>
 
-                        <a href="{{ route('profile.edit') }}"
-                            class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
-                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            Profile
-                        </a>
-
-                        <a href="{{ route('profile.edit') }}"
-                            class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
-                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            Settings
-                        </a>
+                        @foreach($menuItems as $item)
+                            <a href="{{ $item['route'] }}"
+                                class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="{{ $item['icon'] }}" />
+                                </svg>
+                                {{ $item['label'] }}
+                            </a>
+                        @endforeach
 
                         <form method="POST" action="{{ route('logout') }}" class="mt-2">
                             @csrf
@@ -270,6 +246,28 @@
                             </button>
                         </form>
                     </div>
+                </nav>
+            @else
+                <!-- Mobile Authentication Buttons for Guests -->
+                <nav class="flex flex-col space-y-3 px-4">
+                    <a href="{{ route('login') }}"
+                        class="flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium text-sm rounded-lg shadow-md transition-all duration-300">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Sign In
+                    </a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}"
+                            class="flex items-center justify-center px-4 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 shadow-md">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
+                            Create Account
+                        </a>
+                    @endif
                 </nav>
             @endauth
         </div>

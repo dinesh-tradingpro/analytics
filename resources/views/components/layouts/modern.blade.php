@@ -24,17 +24,29 @@
     </script>
 </head>
 
-<body class="min-h-screen bg-gray-50 dark:bg-gray-900" style="transition: none;">
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col" style="transition: none;">
     <x-navbar :current="$current" />
 
-    <main class="min-h-screen">
+    <main class="flex-grow">
         {{ $slot }}
     </main>
+
+    <!-- Footer -->
+    <footer
+        class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-t border-gray-200/20 dark:border-gray-700/30 transition-colors duration-200">
+        <div class="mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    © 2026 TradingPRO. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
 
     <!-- Enable transitions after initial load -->
     <script>
         // Enable transitions after everything is loaded
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             document.body.style.transition = 'background-color 200ms, color 200ms';
         });
     </script>
