@@ -134,7 +134,8 @@
                                 <div class="p-2">
                                     <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ Auth::user()->name ?? 'User' }}</p>
+                                            {{ Auth::user()->name ?? 'User' }}
+                                        </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->email ??
                                             'user@example.com' }}</p>
                                     </div>
@@ -228,7 +229,8 @@
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ Auth::user()->name ?? 'User' }}</p>
+                                    {{ Auth::user()->name ?? 'User' }}
+                                </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->email ??
                                     'user@example.com' }}</p>
                             </div>
@@ -274,7 +276,7 @@
 
 <!-- Theme Toggle Script -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    function initializeNavbar() {
         const themeToggle = document.getElementById('themeToggle');
         const moonIcon = document.getElementById('moonIcon');
         const sunIcon = document.getElementById('sunIcon');
@@ -283,73 +285,121 @@
         const profileDropdownToggle = document.getElementById('profileDropdownToggle');
         const profileDropdownMenu = document.getElementById('profileDropdownMenu');
 
+        // Remove any existing listeners to prevent duplicates
+        if (profileDropdownToggle && profileDropdownToggle._clickHandler) {
+            profileDropdownToggle.removeEventListener('click', profileDropdownToggle._clickHandler);
+        }
+        if (document._outsideClickHandler) {
+            document.removeEventListener('click', document._outsideClickHandler);
+        }
+        if (profileDropdownMenu && profileDropdownMenu._clickHandler) {
+            profileDropdownMenu.removeEventListener('click', profileDropdownMenu._clickHandler);
+        }
+        if (mobileMenuToggle && mobileMenuToggle._clickHandler) {
+            mobileMenuToggle.removeEventListener('click', mobileMenuToggle._clickHandler);
+        }
+        if (themeToggle && themeToggle._clickHandler) {
+            themeToggle.removeEventListener('click', themeToggle._clickHandler);
+        }
+
         // Theme Toggle
         if (themeToggle) {
-            themeToggle.addEventListener('click', () => {
+            const themeHandler = () => {
                 document.documentElement.classList.toggle('dark');
                 if (moonIcon && sunIcon) {
                     moonIcon.classList.toggle('hidden');
                     sunIcon.classList.toggle('hidden');
                 }
 
-                // Save preference
-                if (document.documentElement.classList.contains('dark')) {
+                // Save preference and update global state
+                const isDark = document.documentElement.classList.contains('dark');
+                if (isDark) {
                     localStorage.setItem('theme', 'dark');
                 } else {
                     localStorage.setItem('theme', 'light');
                 }
-            });
+
+                // Update global theme state
+                if (window.__themeState) {
+                    window.__themeState.isDark = isDark;
+                }
+            };
+            themeToggle._clickHandler = themeHandler;
+            themeToggle.addEventListener('click', themeHandler);
         }
 
         // Profile Dropdown Toggle
         if (profileDropdownToggle && profileDropdownMenu) {
-            profileDropdownToggle.addEventListener('click', (e) => {
+            const profileHandler = (e) => {
                 e.stopPropagation();
                 profileDropdownMenu.classList.toggle('opacity-0');
                 profileDropdownMenu.classList.toggle('invisible');
                 profileDropdownMenu.classList.toggle('scale-95');
-            });
+            };
+            profileDropdownToggle._clickHandler = profileHandler;
+            profileDropdownToggle.addEventListener('click', profileHandler);
 
             // Close dropdown when clicking outside
-            document.addEventListener('click', () => {
+            const outsideHandler = () => {
                 if (!profileDropdownMenu.classList.contains('opacity-0')) {
                     profileDropdownMenu.classList.add('opacity-0', 'invisible', 'scale-95');
                 }
-            });
+            };
+            document._outsideClickHandler = outsideHandler;
+            document.addEventListener('click', outsideHandler);
 
             // Prevent dropdown from closing when clicking inside it
-            profileDropdownMenu.addEventListener('click', (e) => {
+            const insideHandler = (e) => {
                 e.stopPropagation();
-            });
+            };
+            profileDropdownMenu._clickHandler = insideHandler;
+            profileDropdownMenu.addEventListener('click', insideHandler);
         }
 
         // Mobile Menu Toggle
         if (mobileMenuToggle && mobileMenu) {
-            mobileMenuToggle.addEventListener('click', () => {
+            const mobileHandler = () => {
                 mobileMenu.classList.toggle('hidden');
                 // Close profile dropdown if open
                 if (profileDropdownMenu && !profileDropdownMenu.classList.contains('opacity-0')) {
                     profileDropdownMenu.classList.add('opacity-0', 'invisible', 'scale-95');
                 }
-            });
+            };
+            mobileMenuToggle._clickHandler = mobileHandler;
+            mobileMenuToggle.addEventListener('click', mobileHandler);
 
             // Close mobile menu when clicking on a link
             const mobileMenuLinks = mobileMenu.querySelectorAll('a');
             mobileMenuLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
-                });
+                if (!link._clickHandler) {
+                    const linkHandler = () => {
+                        mobileMenu.classList.add('hidden');
+                    };
+                    link._clickHandler = linkHandler;
+                    link.addEventListener('click', linkHandler);
+                }
             });
         }
 
-        // Load saved theme
-        if (localStorage.getItem('theme') === 'dark' ||
-            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            if (moonIcon && sunIcon) {
+        // Load saved theme and update icons
+        const isDark = window.__themeState?.isDark ??
+            (localStorage.getItem('theme') === 'dark' ||
+                (localStorage.getItem('theme') === null && window.matchMedia('(prefers-color-scheme: dark)').matches));
+
+        if (moonIcon && sunIcon) {
+            if (isDark) {
                 moonIcon.classList.add('hidden');
                 sunIcon.classList.remove('hidden');
+            } else {
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
             }
         }
-    });
+    }
+
+    // Initialize on DOM ready
+    document.addEventListener('DOMContentLoaded', initializeNavbar);
+
+    // Re-initialize after Livewire navigation
+    document.addEventListener('livewire:navigated', initializeNavbar);
 </script>
