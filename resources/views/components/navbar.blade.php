@@ -35,18 +35,18 @@
                 </div>
                 <div>
                     <h1
-                        class="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                        TradingPro Analytics
+                        class="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                        TP Analytics
                     </h1>
                     <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">
                         @if($current === 'dashboard')
                             Dashboard
                         @elseif($current === 'user-analytics')
-                            User Analytics
+                            Data
                         @elseif($current === 'transactions')
-                            Transaction Analytics
+                            Reports
                         @else
-                            Analytics
+                            Beta
                         @endif
                     </p>
                 </div>
@@ -54,42 +54,44 @@
 
             <!-- Enhanced Navigation -->
             <div class="flex items-center space-x-6">
-                <nav
-                    class="hidden md:flex items-center space-x-2 bg-gray-50/50 dark:bg-gray-800/50 rounded-full p-1 border border-gray-200/50 dark:border-gray-700/50">
-                    <a href="{{ route('dashboard') }}" @class([
-                        'px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:shadow-md backdrop-blur-sm',
-                        'relative font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105' => $current === 'dashboard',
-                        'text-gray-700 hover:text-gray-900 hover:bg-white/60 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/60' => $current !== 'dashboard'
-                    ])>
-                        @if($current === 'dashboard')
-                            <span class="relative z-10">Dashboard</span>
-                        @else
-                            Dashboard
-                        @endif
-                    </a>
-                    <a href="{{ route('user-analytics') }}" @class([
-                        'px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:shadow-md backdrop-blur-sm',
-                        'relative font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105' => $current === 'user-analytics',
-                        'text-gray-700 hover:text-gray-900 hover:bg-white/60 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/60' => $current !== 'user-analytics'
-                    ])>
-                        @if($current === 'user-analytics')
-                            <span class="relative z-10">Users</span>
-                        @else
-                            Users
-                        @endif
-                    </a>
-                    <a href="{{ route('transactions') }}" @class([
-                        'px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:shadow-md backdrop-blur-sm',
-                        'relative font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105' => $current === 'transactions',
-                        'text-gray-700 hover:text-gray-900 hover:bg-white/60 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/60' => $current !== 'transactions'
-                    ])>
-                        @if($current === 'transactions')
-                            <span class="relative z-10">Transactions</span>
-                        @else
-                            Transactions
-                        @endif
-                    </a>
-                </nav>
+                @auth
+                    <nav
+                        class="hidden md:flex items-center space-x-2 bg-gray-50/50 dark:bg-gray-800/50 rounded-full p-1 border border-gray-200/50 dark:border-gray-700/50">
+                        <a href="{{ route('dashboard') }}" @class([
+                            'px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:shadow-md backdrop-blur-sm',
+                            'relative font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105' => $current === 'dashboard',
+                            'text-gray-700 hover:text-gray-900 hover:bg-white/60 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/60' => $current !== 'dashboard'
+                        ])>
+                            @if($current === 'dashboard')
+                                <span class="relative z-10">Dashboard</span>
+                            @else
+                                Dashboard
+                            @endif
+                        </a>
+                        <a href="{{ route('user-analytics') }}" @class([
+                            'px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:shadow-md backdrop-blur-sm',
+                            'relative font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105' => $current === 'user-analytics',
+                            'text-gray-700 hover:text-gray-900 hover:bg-white/60 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/60' => $current !== 'user-analytics'
+                        ])>
+                            @if($current === 'user-analytics')
+                                <span class="relative z-10">Data</span>
+                            @else
+                                Data
+                            @endif
+                        </a>
+                        <a href="{{ route('transactions') }}" @class([
+                            'px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 hover:shadow-md backdrop-blur-sm',
+                            'relative font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105' => $current === 'transactions',
+                            'text-gray-700 hover:text-gray-900 hover:bg-white/60 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700/60' => $current !== 'transactions'
+                        ])>
+                            @if($current === 'transactions')
+                                <span class="relative z-10">Reports</span>
+                            @else
+                                Reports
+                            @endif
+                        </a>
+                    </nav>
+                @endauth
 
                 <!-- Theme Toggle with enhanced design -->
                 <div class="flex items-center space-x-3">
@@ -193,31 +195,31 @@
 
         <!-- Mobile Navigation -->
         <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200/50 dark:border-gray-700/50 pt-4 pb-6">
-            <nav class="flex flex-col space-y-2">
-                <a href="{{ route('dashboard') }}" @class([
-                    'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
-                    'font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' => $current === 'dashboard',
-                    'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700' => $current !== 'dashboard'
-                ])>
-                    Dashboard
-                </a>
-                <a href="{{ route('user-analytics') }}" @class([
-                    'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
-                    'font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' => $current === 'user-analytics',
-                    'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700' => $current !== 'user-analytics'
-                ])>
-                    Users
-                </a>
-                <a href="{{ route('transactions') }}" @class([
-                    'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
-                    'font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' => $current === 'transactions',
-                    'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700' => $current !== 'transactions'
-                ])>
-                    Transactions
-                </a>
+            @auth
+                <nav class="flex flex-col space-y-2">
+                    <a href="{{ route('dashboard') }}" @class([
+                        'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
+                        'font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' => $current === 'dashboard',
+                        'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700' => $current !== 'dashboard'
+                    ])>
+                        Dashboard
+                    </a>
+                    <a href="{{ route('user-analytics') }}" @class([
+                        'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
+                        'font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' => $current === 'user-analytics',
+                        'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700' => $current !== 'user-analytics'
+                    ])>
+                        Data
+                    </a>
+                    <a href="{{ route('transactions') }}" @class([
+                        'px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
+                        'font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' => $current === 'transactions',
+                        'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700' => $current !== 'transactions'
+                    ])>
+                        Reports
+                    </a>
 
-                <!-- Mobile Profile Section -->
-                @auth
+                    <!-- Mobile Profile Section -->
                     <div class="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
                         <div class="flex items-center px-4 py-2 mb-2">
                             <div
@@ -268,8 +270,8 @@
                             </button>
                         </form>
                     </div>
-                @endauth
-            </nav>
+                </nav>
+            @endauth
         </div>
     </div>
 </div>
