@@ -81,8 +81,6 @@
             });
         });
     </script>
-
-    @fluxScripts
 </body>
 
 </html>
