@@ -6,28 +6,28 @@ use App\Http\Controllers\Controller;
 use App\Models\UserAnalyticsCache;
 use Illuminate\Console\Command;
 
-class SyncNewUserAnalytics extends Command
+class SyncUsers extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'analytics:sync-new {--force : Force refresh even if cache is fresh}';
+    protected $signature = 'sync:users {--force : Force refresh even if cache is fresh}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Sync user analytics with new criteria: only users with firstDepositDate, active = status active + lastLoginDate today, new users by registration date, inactive users by last login date';
+    protected $description = 'Sync user analytics data: active users (with firstDepositDate + logged in today), new users (by registration date), and inactive users (by last login date)';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $this->info('🔄 Starting new user analytics sync...');
+        $this->info('🔄 Starting user analytics sync...');
 
         $startTime = now();
 
@@ -50,10 +50,10 @@ class SyncNewUserAnalytics extends Command
             $this->syncInactiveUsers($controller);
 
             $duration = $startTime->diffInSeconds(now());
-            $this->info("✅ New analytics sync completed successfully in {$duration} seconds!");
+            $this->info("✅ User analytics sync completed successfully in {$duration} seconds!");
 
         } catch (\Exception $e) {
-            $this->error('❌ New analytics sync failed: '.$e->getMessage());
+            $this->error('❌ User analytics sync failed: '.$e->getMessage());
             $this->error('Stack trace: '.$e->getTraceAsString());
 
             return 1;

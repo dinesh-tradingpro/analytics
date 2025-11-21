@@ -7,14 +7,14 @@ use App\Models\TransactionAnalyticsCache;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
-class SyncTransactionAnalytics extends Command
+class SyncTransactions extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'transactions:sync
+    protected $signature = 'sync:transactions
                             {--force : Force refresh even if cache is fresh}
                             {--limit=150000 : Maximum number of records to fetch per transaction type}
                             {--batch-size=1000 : Number of records per API call}
