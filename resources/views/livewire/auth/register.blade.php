@@ -1,7 +1,9 @@
 <x-layouts.modern current="register">
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+        class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
+            <div
+                class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
                 <div class="flex flex-col gap-6">
                     <x-auth-header :title="__('Create an account')" :description="__('Enter your details below to create your account')" />
 
@@ -11,50 +13,24 @@
                     <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-6">
                         @csrf
                         <!-- Name -->
-                        <flux:input
-                            name="name"
-                            :label="__('Name')"
-                            type="text"
-                            required
-                            autofocus
-                            autocomplete="name"
-                            :placeholder="__('Full name')"
-                        />
+                        <flux:input name="name" :label="__('Name')" type="text" required autofocus autocomplete="name"
+                            :placeholder="__('Full name')" />
 
                         <!-- Email Address -->
-                        <flux:input
-                            name="email"
-                            :label="__('Email address')"
-                            type="email"
-                            required
-                            autocomplete="email"
-                            placeholder="email@example.com"
-                        />
+                        <flux:input name="email" :label="__('Email address')" type="email" required autocomplete="email"
+                            placeholder="email@example.com" />
 
                         <!-- Password -->
-                        <flux:input
-                            name="password"
-                            :label="__('Password')"
-                            type="password"
-                            required
-                            autocomplete="new-password"
-                            :placeholder="__('Password')"
-                            viewable
-                        />
+                        <flux:input name="password" :label="__('Password')" type="password" required
+                            autocomplete="new-password" :placeholder="__('Password')" viewable />
 
                         <!-- Confirm Password -->
-                        <flux:input
-                            name="password_confirmation"
-                            :label="__('Confirm password')"
-                            type="password"
-                            required
-                            autocomplete="new-password"
-                            :placeholder="__('Confirm password')"
-                            viewable
-                        />
+                        <flux:input name="password_confirmation" :label="__('Confirm password')" type="password"
+                            required autocomplete="new-password" :placeholder="__('Confirm password')" viewable />
 
                         <div class="flex items-center justify-end">
-                            <flux:button type="submit" variant="primary" class="w-full" data-test="register-user-button">
+                            <flux:button type="submit" variant="primary" class="w-full"
+                                data-test="register-user-button">
                                 {{ __('Create account') }}
                             </flux:button>
                         </div>
@@ -68,4 +44,5 @@
             </div>
         </div>
     </div>
+    @fluxScripts()
 </x-layouts.modern>
