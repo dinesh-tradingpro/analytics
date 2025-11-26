@@ -154,7 +154,8 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">This Month's Transaction Volume</h3>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ now()->format('F Y') }}</div>
+                    {{ now()->format('F Y') }}
+                </div>
             </div>
             <div class="h-96">
                 <canvas id="monthlyVolumeChart" class="w-full h-full"></canvas>
@@ -166,7 +167,8 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Past 7 Days Transaction Volume</h3>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ now()->subDays(6)->format('M d') }} - {{ now()->format('M d') }}</div>
+                    {{ now()->subDays(6)->format('M d') }} - {{ now()->format('M d') }}
+                </div>
             </div>
             <div class="h-96">
                 <canvas id="weeklyVolumeChart" class="w-full h-full"></canvas>
@@ -178,7 +180,8 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Transaction Volume Trends</h3>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ ucfirst(str_replace('_', ' ', $selectedPeriod)) }} View</div>
+                    {{ ucfirst(str_replace('_', ' ', $selectedPeriod)) }} View
+                </div>
             </div>
             <div class="h-96">
                 <canvas id="volumeChart" class="w-full h-full"></canvas>
@@ -238,14 +241,14 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                                    {{ $transaction['type'] === 'deposit' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
+                                                            {{ $transaction['type'] === 'deposit' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
                                             {{ ucfirst($transaction['type']) }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                                    {{ $transaction['status'] === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+                                                            {{ $transaction['status'] === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
                                             {{ ucfirst($transaction['status']) }}
                                         </span>
                                     </td>
@@ -299,56 +302,36 @@
                                 data: monthlyData.depositApproved,
                                 borderColor: '#10b981',
                                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                borderWidth: 3,
+                                borderWidth: 2,
                                 fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: '#10b981',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                pointRadius: 6,
-                                pointStyle: 'circle'
+                                tension: 0.4
                             },
                             {
                                 label: 'Declined Deposits',
                                 data: monthlyData.depositDeclined,
                                 borderColor: '#f59e0b',
                                 backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                borderWidth: 3,
+                                borderWidth: 2,
                                 fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: '#f59e0b',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                pointRadius: 6,
-                                pointStyle: 'triangle'
+                                tension: 0.4
                             },
                             {
                                 label: 'Approved Withdrawals',
                                 data: monthlyData.withdrawalApproved,
                                 borderColor: '#3b82f6',
                                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                borderWidth: 3,
+                                borderWidth: 2,
                                 fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: '#3b82f6',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                pointRadius: 6,
-                                pointStyle: 'rect'
+                                tension: 0.4
                             },
                             {
                                 label: 'Declined Withdrawals',
                                 data: monthlyData.withdrawalDeclined,
                                 borderColor: '#ef4444',
                                 backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                borderWidth: 3,
+                                borderWidth: 2,
                                 fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: '#ef4444',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                pointRadius: 6,
-                                pointStyle: 'rectRot'
+                                tension: 0.4
                             }
                         ]
                     },
@@ -359,9 +342,7 @@
                             legend: {
                                 position: 'top',
                                 labels: {
-                                    color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#374151',
-                                    padding: 20,
-                                    usePointStyle: true
+                                    color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#374151'
                                 }
                             }
                         },
@@ -370,7 +351,7 @@
                                 beginAtZero: true,
                                 ticks: {
                                     color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280',
-                                    callback: function(value) {
+                                    callback: function (value) {
                                         return '$' + value.toLocaleString();
                                     }
                                 },
@@ -411,56 +392,36 @@
                                 data: weeklyData.depositApproved,
                                 borderColor: '#10b981',
                                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                borderWidth: 3,
+                                borderWidth: 2,
                                 fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: '#10b981',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                pointRadius: 6,
-                                pointStyle: 'circle'
+                                tension: 0.4
                             },
                             {
                                 label: 'Declined Deposits',
                                 data: weeklyData.depositDeclined,
                                 borderColor: '#f59e0b',
                                 backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                borderWidth: 3,
+                                borderWidth: 2,
                                 fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: '#f59e0b',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                pointRadius: 6,
-                                pointStyle: 'triangle'
+                                tension: 0.4
                             },
                             {
                                 label: 'Approved Withdrawals',
                                 data: weeklyData.withdrawalApproved,
                                 borderColor: '#3b82f6',
                                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                borderWidth: 3,
+                                borderWidth: 2,
                                 fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: '#3b82f6',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                pointRadius: 6,
-                                pointStyle: 'rect'
+                                tension: 0.4
                             },
                             {
                                 label: 'Declined Withdrawals',
                                 data: weeklyData.withdrawalDeclined,
                                 borderColor: '#ef4444',
                                 backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                borderWidth: 3,
+                                borderWidth: 2,
                                 fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: '#ef4444',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                pointRadius: 6,
-                                pointStyle: 'rectRot'
+                                tension: 0.4
                             }
                         ]
                     },
@@ -471,9 +432,7 @@
                             legend: {
                                 position: 'top',
                                 labels: {
-                                    color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#374151',
-                                    padding: 20,
-                                    usePointStyle: true
+                                    color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#374151'
                                 }
                             }
                         },
@@ -482,7 +441,7 @@
                                 beginAtZero: true,
                                 ticks: {
                                     color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280',
-                                    callback: function(value) {
+                                    callback: function (value) {
                                         return '$' + value.toLocaleString();
                                     }
                                 },

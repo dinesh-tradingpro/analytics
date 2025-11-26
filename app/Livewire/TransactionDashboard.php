@@ -189,7 +189,7 @@ class TransactionDashboard extends Component
     {
         $startDate = now()->startOfMonth();
         $endDate = now()->endOfMonth();
-        
+
         return $this->getVolumeDataForPeriod($startDate, $endDate, 'daily');
     }
 
@@ -198,39 +198,105 @@ class TransactionDashboard extends Component
     {
         $startDate = now()->subDays(6)->startOfDay();
         $endDate = now()->endOfDay();
-        
+
         return $this->getVolumeDataForPeriod($startDate, $endDate, 'daily');
     }
 
     private function getVolumeDataForPeriod($startDate, $endDate, $groupBy = 'daily')
     {
-        // This is a simplified version - in production you'd query your actual transaction data
-        // For now, we'll generate sample data based on the period
-        $data = [];
+        // Determine the period type based on the date range
+        $periodType = $this->determinePeriodType($startDate, $endDate);
+
+        // Fetch data from cache for each transaction type and status
+        $depositApproved = TransactionAnalyticsCache::where('transaction_type', 'deposit')
+            ->where('status', 'approved')
+            ->where('period_type', $periodType)
+            ->orderBy('synced_at', 'desc')
+            ->first();
+
+        $depositDeclined = TransactionAnalyticsCache::where('transaction_type', 'deposit')
+            ->where('status', 'declined')
+            ->where('period_type', $periodType)
+            ->orderBy('synced_at', 'desc')
+            ->first();
+
+        $withdrawalApproved = TransactionAnalyticsCache::where('transaction_type', 'withdrawal')
+            ->where('status', 'approved')
+            ->where('period_type', $periodType)
+            ->orderBy('synced_at', 'desc')
+            ->first();
+
+        $withdrawalDeclined = TransactionAnalyticsCache::where('transaction_type', 'withdrawal')
+            ->where('status', 'declined')
+            ->where('period_type', $periodType)
+            ->orderBy('synced_at', 'desc')
+            ->first();
+
+        // Extract chart data or use empty arrays as fallback
         $labels = [];
         $depositApprovedData = [];
         $depositDeclinedData = [];
         $withdrawalApprovedData = [];
         $withdrawalDeclinedData = [];
-        
-        $current = $startDate->copy();
-        while ($current <= $endDate) {
-            $labels[] = $current->format('M d');
-            // Generate sample data - replace with actual database queries
-            $depositApprovedData[] = rand(800, 40000);
-            $depositDeclinedData[] = rand(200, 8000);
-            $withdrawalApprovedData[] = rand(600, 35000);
-            $withdrawalDeclinedData[] = rand(150, 6000);
-            $current->addDay();
+
+        // Use the first available dataset for labels
+        $firstData = $depositApproved ?? $depositDeclined ?? $withdrawalApproved ?? $withdrawalDeclined;
+        if ($firstData && $firstData->chart_data) {
+            $chartData = $firstData->chart_data;
+            if (isset($chartData['labels'])) {
+                $labels = array_map(function ($date) {
+                    return \Carbon\Carbon::parse($date)->format('M d');
+                }, $chartData['labels']);
+            }
         }
-        
+
+        // Extract transaction count data for each type
+        if ($depositApproved && $depositApproved->chart_data && isset($depositApproved->chart_data['datasets'][0]['data'])) {
+            $depositApprovedData = $depositApproved->chart_data['datasets'][0]['data'];
+        }
+
+        if ($depositDeclined && $depositDeclined->chart_data && isset($depositDeclined->chart_data['datasets'][0]['data'])) {
+            $depositDeclinedData = $depositDeclined->chart_data['datasets'][0]['data'];
+        }
+
+        if ($withdrawalApproved && $withdrawalApproved->chart_data && isset($withdrawalApproved->chart_data['datasets'][0]['data'])) {
+            $withdrawalApprovedData = $withdrawalApproved->chart_data['datasets'][0]['data'];
+        }
+
+        if ($withdrawalDeclined && $withdrawalDeclined->chart_data && isset($withdrawalDeclined->chart_data['datasets'][0]['data'])) {
+            $withdrawalDeclinedData = $withdrawalDeclined->chart_data['datasets'][0]['data'];
+        }
+
+        // Ensure all arrays have the same length
+        $dataLength = count($labels);
+        $depositApprovedData = array_pad($depositApprovedData, $dataLength, 0);
+        $depositDeclinedData = array_pad($depositDeclinedData, $dataLength, 0);
+        $withdrawalApprovedData = array_pad($withdrawalApprovedData, $dataLength, 0);
+        $withdrawalDeclinedData = array_pad($withdrawalDeclinedData, $dataLength, 0);
+
         return [
             'labels' => $labels,
             'depositApproved' => $depositApprovedData,
             'depositDeclined' => $depositDeclinedData,
             'withdrawalApproved' => $withdrawalApprovedData,
-            'withdrawalDeclined' => $withdrawalDeclinedData
+            'withdrawalDeclined' => $withdrawalDeclinedData,
         ];
+    }
+
+    private function determinePeriodType($startDate, $endDate)
+    {
+        // Check if it's current month
+        if ($startDate->isSameMonth(now()) && $startDate->day === 1) {
+            return 'current_month';
+        }
+
+        // Check if it's last 7 days
+        if ($startDate->diffInDays(now()) <= 7 && $endDate->isToday()) {
+            return 'last_7_days';
+        }
+
+        // Default fallback
+        return 'daily';
     }
 
     public function toggleTopTransactions()
