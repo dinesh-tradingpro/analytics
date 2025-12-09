@@ -65,10 +65,10 @@
                 <div>
                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Deposit Volume</p>
                     <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                        ${{ number_format(optional($this->depositsApproved)->total_amount ?? 0, 2) }}
+                        ${{ number_format($this->transactionStats['deposit_approved']->total_amount ?? 0, 2) }}
                     </p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {{ number_format(optional($this->depositsApproved)->total_count ?? 0) }} transactions
+                        {{ number_format($this->transactionStats['deposit_approved']->count ?? 0) }} transactions
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center">
@@ -87,10 +87,10 @@
                 <div>
                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Withdrawal Volume</p>
                     <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                        ${{ number_format(optional($this->withdrawalsApproved)->total_amount ?? 0, 2) }}
+                        ${{ number_format($this->transactionStats['withdrawal_approved']->total_amount ?? 0, 2) }}
                     </p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {{ number_format(optional($this->withdrawalsApproved)->total_count ?? 0) }} transactions
+                        {{ number_format($this->transactionStats['withdrawal_approved']->count ?? 0) }} transactions
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-red-100 dark:bg-red-900/50 rounded-lg flex items-center justify-center">
@@ -108,12 +108,20 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Success Rate</p>
+                    @php
+                        $depositCount = ($this->transactionStats['deposit_approved']->count ?? 0) + ($this->transactionStats['deposit_declined']->count ?? 0);
+                        $withdrawalCount = ($this->transactionStats['withdrawal_approved']->count ?? 0) + ($this->transactionStats['withdrawal_declined']->count ?? 0);
+                        $depositSuccess = $depositCount > 0 ? round((($this->transactionStats['deposit_approved']->count ?? 0) / $depositCount) * 100, 2) : 0;
+                        $withdrawalSuccess = $withdrawalCount > 0 ? round((($this->transactionStats['withdrawal_approved']->count ?? 0) / $withdrawalCount) * 100, 2) : 0;
+                        $totalCount = $depositCount + $withdrawalCount;
+                        $totalApproved = ($this->transactionStats['deposit_approved']->count ?? 0) + ($this->transactionStats['withdrawal_approved']->count ?? 0);
+                        $overallSuccess = $totalCount > 0 ? round(($totalApproved / $totalCount) * 100, 2) : 0;
+                    @endphp
                     <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                        {{ $this->successRates['overall_success_rate'] }}%
+                        {{ $overallSuccess }}%
                     </p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Deposits: {{ $this->successRates['deposit_success_rate'] }}% |
-                        Withdrawals: {{ $this->successRates['withdrawal_success_rate'] }}%
+                        Deposits: {{ $depositSuccess }}% | Withdrawals: {{ $withdrawalSuccess }}%
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
@@ -131,19 +139,24 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Net Flow</p>
+                    @php
+                        $depositTotal = $this->transactionStats['deposit_approved']->total_amount ?? 0;
+                        $withdrawalTotal = $this->transactionStats['withdrawal_approved']->total_amount ?? 0;
+                        $netFlow = $depositTotal - $withdrawalTotal;
+                    @endphp
                     <p
-                        class="text-2xl font-bold {{ $this->volumeMetrics['net_flow'] >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                        ${{ number_format($this->volumeMetrics['net_flow'], 2) }}
+                        class="text-2xl font-bold {{ $netFlow >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                        ${{ number_format($netFlow, 2) }}
                     </p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {{ $this->volumeMetrics['net_flow'] >= 0 ? 'Positive' : 'Negative' }} flow
+                        {{ $netFlow >= 0 ? 'Positive' : 'Negative' }} flow
                     </p>
                 </div>
                 <div
-                    class="w-12 h-12 {{ $this->volumeMetrics['net_flow'] >= 0 ? 'bg-green-100 dark:bg-green-900/50' : 'bg-red-100 dark:bg-red-900/50' }} rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 {{ $this->volumeMetrics['net_flow'] >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}"
+                    class="w-12 h-12 {{ $netFlow >= 0 ? 'bg-green-100 dark:bg-green-900/50' : 'bg-red-100 dark:bg-red-900/50' }} rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 {{ $netFlow >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        @if ($this->volumeMetrics['net_flow'] >= 0)
+                        @if ($netFlow >= 0)
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                         @else
@@ -164,10 +177,10 @@
                 <div>
                     <p class="text-sm font-medium text-purple-700 dark:text-purple-300">Total Transactions</p>
                     <p class="text-2xl font-bold text-purple-900 dark:text-white mt-1">
-                        {{ number_format(($this->depositsApproved->total_count ?? 0) + ($this->depositsDeclined->total_count ?? 0) + ($this->withdrawalsApproved->total_count ?? 0) + ($this->withdrawalsDeclined->total_count ?? 0)) }}
+                        {{ number_format($this->transactionStats['total_all_count']) }}
                     </p>
                     <p class="text-sm text-purple-600 dark:text-purple-400 mt-1">
-                        {{ number_format(($this->depositsApproved->total_count ?? 0) + ($this->withdrawalsApproved->total_count ?? 0)) }} approved
+                        {{ number_format($this->transactionStats['total_approved_count']) }} approved
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-purple-200 dark:bg-purple-700 rounded-lg flex items-center justify-center">
@@ -178,21 +191,16 @@
             </div>
         </div>
 
-        <!-- Average Transaction Amount -->
+        <!-- Total Amount -->
         <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl shadow-sm border border-indigo-200 dark:border-indigo-700 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-indigo-700 dark:text-indigo-300">Avg Transaction</p>
-                    @php
-                        $totalAmount = ($this->depositsApproved->total_amount ?? 0) + ($this->withdrawalsApproved->total_amount ?? 0);
-                        $totalCount = ($this->depositsApproved->total_count ?? 0) + ($this->withdrawalsApproved->total_count ?? 0);
-                        $avgAmount = $totalCount > 0 ? $totalAmount / $totalCount : 0;
-                    @endphp
+                    <p class="text-sm font-medium text-indigo-700 dark:text-indigo-300">Total Volume</p>
                     <p class="text-2xl font-bold text-indigo-900 dark:text-white mt-1">
-                        ${{ number_format($avgAmount, 2) }}
+                        ${{ number_format($this->transactionStats['total_approved_amount'], 2) }}
                     </p>
                     <p class="text-sm text-indigo-600 dark:text-indigo-400 mt-1">
-                        Per transaction
+                        Approved amount
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-indigo-200 dark:bg-indigo-700 rounded-lg flex items-center justify-center">
@@ -203,41 +211,51 @@
             </div>
         </div>
 
-        <!-- Declined Transactions -->
+        <!-- Average Transaction -->
         <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 rounded-xl shadow-sm border border-orange-200 dark:border-orange-700 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-orange-700 dark:text-orange-300">Declined</p>
+                    <p class="text-sm font-medium text-orange-700 dark:text-orange-300">Avg Amount</p>
+                    @php
+                        $totalCount = $this->transactionStats['total_approved_count'];
+                        $totalAmount = $this->transactionStats['total_approved_amount'];
+                        $avgAmount = $totalCount > 0 ? $totalAmount / $totalCount : 0;
+                    @endphp
                     <p class="text-2xl font-bold text-orange-900 dark:text-white mt-1">
-                        {{ number_format(($this->depositsDeclined->total_count ?? 0) + ($this->withdrawalsDeclined->total_count ?? 0)) }}
+                        ${{ number_format($avgAmount, 2) }}
                     </p>
                     <p class="text-sm text-orange-600 dark:text-orange-400 mt-1">
-                        ${{ number_format(($this->depositsDeclined->total_amount ?? 0) + ($this->withdrawalsDeclined->total_amount ?? 0), 0) }}
+                        Per transaction
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-orange-200 dark:bg-orange-700 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-orange-600 dark:text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12a3 3 0 110-6 3 3 0 010 6zm0 0a6 6 0 100 12 6 6 0 000-12z" />
                     </svg>
                 </div>
             </div>
         </div>
 
-        <!-- Volume Ratio -->
+        <!-- Deposit/Withdrawal Ratio -->
         <div class="bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-900/30 dark:to-teal-800/30 rounded-xl shadow-sm border border-teal-200 dark:border-teal-700 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-teal-700 dark:text-teal-300">W/D Ratio</p>
+                    <p class="text-sm font-medium text-teal-700 dark:text-teal-300">D/W Ratio</p>
+                    @php
+                        $depositCount = $this->transactionStats['deposit_approved']->count ?? 0;
+                        $withdrawalCount = $this->transactionStats['withdrawal_approved']->count ?? 0;
+                        $ratio = $withdrawalCount > 0 ? round(($depositCount / $withdrawalCount), 2) : 0;
+                    @endphp
                     <p class="text-2xl font-bold text-teal-900 dark:text-white mt-1">
-                        {{ $this->volumeMetrics['volume_ratio'] }}%
+                        {{ $ratio }}:1
                     </p>
                     <p class="text-sm text-teal-600 dark:text-teal-400 mt-1">
-                        Withdrawal/Deposit
+                        {{ number_format($depositCount) }} vs {{ number_format($withdrawalCount) }}
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-teal-200 dark:bg-teal-700 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-teal-600 dark:text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                     </svg>
                 </div>
             </div>

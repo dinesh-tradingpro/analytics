@@ -101,10 +101,68 @@ class TransactionDashboard extends Component
     }
 
     #[Computed]
+    public function transactionStats()
+    {
+        try {
+            // Get real transaction data from TransactionDetail model
+            $depositApproved = TransactionDetail::selectRaw('
+                COUNT(*) as count,
+                SUM(processed_amount) as total_amount,
+                AVG(processed_amount) as avg_amount
+            ')
+                ->where('transaction_type', 'deposit')
+                ->where('status', 'approved')
+                ->first();
+
+            $withdrawalApproved = TransactionDetail::selectRaw('
+                COUNT(*) as count,
+                SUM(processed_amount) as total_amount,
+                AVG(processed_amount) as avg_amount
+            ')
+                ->where('transaction_type', 'withdrawal')
+                ->where('status', 'approved')
+                ->first();
+
+            $depositDeclined = TransactionDetail::selectRaw('COUNT(*) as count')
+                ->where('transaction_type', 'deposit')
+                ->where('status', 'declined')
+                ->first();
+
+            $withdrawalDeclined = TransactionDetail::selectRaw('COUNT(*) as count')
+                ->where('transaction_type', 'withdrawal')
+                ->where('status', 'declined')
+                ->first();
+
+            return [
+                'deposit_approved' => $depositApproved,
+                'withdrawal_approved' => $withdrawalApproved,
+                'deposit_declined' => $depositDeclined,
+                'withdrawal_declined' => $withdrawalDeclined,
+                'total_approved_amount' => ($depositApproved->total_amount ?? 0) + ($withdrawalApproved->total_amount ?? 0),
+                'total_approved_count' => ($depositApproved->count ?? 0) + ($withdrawalApproved->count ?? 0),
+                'total_declined_count' => ($depositDeclined->count ?? 0) + ($withdrawalDeclined->count ?? 0),
+                'total_all_count' => ($depositApproved->count ?? 0) + ($withdrawalApproved->count ?? 0) + ($depositDeclined->count ?? 0) + ($withdrawalDeclined->count ?? 0),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'deposit_approved' => null,
+                'withdrawal_approved' => null,
+                'deposit_declined' => null,
+                'withdrawal_declined' => null,
+                'total_approved_amount' => 0,
+                'total_approved_count' => 0,
+                'total_declined_count' => 0,
+                'total_all_count' => 0,
+            ];
+        }
+    }
+
+    #[Computed]
     public function volumeMetrics()
     {
-        $approvedDeposits = $this->depositsApproved->total_amount ?? 0;
-        $approvedWithdrawals = $this->withdrawalsApproved->total_amount ?? 0;
+        $stats = $this->transactionStats;
+        $approvedDeposits = $stats['deposit_approved']->total_amount ?? 0;
+        $approvedWithdrawals = $stats['withdrawal_approved']->total_amount ?? 0;
         $netFlow = $approvedDeposits - $approvedWithdrawals;
 
         return [
