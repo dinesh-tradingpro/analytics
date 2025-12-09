@@ -18,6 +18,7 @@ class TransactionDashboard extends Component
 
     // Insights filters
     public $dateRange = '30';
+
     public $topLimit = 10;
 
     public function mount()
@@ -386,6 +387,7 @@ class TransactionDashboard extends Component
         try {
             $endDate = Carbon::now();
             $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+
             return TransactionDetail::getTopTransactions('deposit', $this->topLimit, $startDate, $endDate);
         } catch (\Exception $e) {
             return collect();
@@ -398,6 +400,7 @@ class TransactionDashboard extends Component
         try {
             $endDate = Carbon::now();
             $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+
             return TransactionDetail::getTopTransactions('withdrawal', $this->topLimit, $startDate, $endDate);
         } catch (\Exception $e) {
             return collect();
@@ -410,6 +413,7 @@ class TransactionDashboard extends Component
         try {
             $endDate = Carbon::now();
             $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+
             return TransactionDetail::getRepeatTransactionUsers('deposit', $this->topLimit, $startDate, $endDate);
         } catch (\Exception $e) {
             return collect();
@@ -422,6 +426,7 @@ class TransactionDashboard extends Component
         try {
             $endDate = Carbon::now();
             $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+
             return TransactionDetail::getRepeatTransactionUsers('withdrawal', $this->topLimit, $startDate, $endDate);
         } catch (\Exception $e) {
             return collect();
