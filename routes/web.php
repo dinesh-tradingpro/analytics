@@ -21,10 +21,6 @@ Route::view('transactions', 'transactions')
     ->middleware(['auth', 'verified', 'check.authorized.access'])
     ->name('transactions');
 
-Route::view('transaction-insights', 'transaction-insights')
-    ->middleware(['auth', 'verified', 'check.authorized.access'])
-    ->name('transaction-insights');
-
 Route::middleware(['auth', 'check.authorized.access'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

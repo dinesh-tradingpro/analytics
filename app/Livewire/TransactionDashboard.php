@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\TransactionAnalyticsCache;
+use App\Models\TransactionDetail;
+use Carbon\Carbon;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -14,6 +16,10 @@ class TransactionDashboard extends Component
 
     public $error = null;
 
+    // Insights filters
+    public $dateRange = '30';
+    public $topLimit = 10;
+
     public function mount()
     {
         // Check if we have fresh data, if not suggest sync
@@ -21,6 +27,16 @@ class TransactionDashboard extends Component
         if (! $hasRecentData) {
             session()->flash('sync_needed', 'Transaction data is stale or missing. Consider running: php artisan transactions:sync');
         }
+    }
+
+    public function updatedDateRange()
+    {
+        // Trigger re-render when date range changes
+    }
+
+    public function updatedTopLimit()
+    {
+        // Trigger re-render when top limit changes
     }
 
     #[Computed]
@@ -299,16 +315,59 @@ class TransactionDashboard extends Component
         return 'daily';
     }
 
-    public function toggleTopTransactions()
-    {
-        $this->showTopTransactions = ! $this->showTopTransactions;
-    }
-
     private function checkForRecentData()
     {
         $recentData = TransactionAnalyticsCache::where('synced_at', '>', now()->subHours(2))->first();
 
         return $recentData !== null;
+    }
+
+    #[Computed]
+    public function topDeposits()
+    {
+        try {
+            $endDate = Carbon::now();
+            $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+            return TransactionDetail::getTopTransactions('deposit', $this->topLimit, $startDate, $endDate);
+        } catch (\Exception $e) {
+            return collect();
+        }
+    }
+
+    #[Computed]
+    public function topWithdrawals()
+    {
+        try {
+            $endDate = Carbon::now();
+            $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+            return TransactionDetail::getTopTransactions('withdrawal', $this->topLimit, $startDate, $endDate);
+        } catch (\Exception $e) {
+            return collect();
+        }
+    }
+
+    #[Computed]
+    public function repeatDepositUsers()
+    {
+        try {
+            $endDate = Carbon::now();
+            $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+            return TransactionDetail::getRepeatTransactionUsers('deposit', $this->topLimit, $startDate, $endDate);
+        } catch (\Exception $e) {
+            return collect();
+        }
+    }
+
+    #[Computed]
+    public function repeatWithdrawalUsers()
+    {
+        try {
+            $endDate = Carbon::now();
+            $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+            return TransactionDetail::getRepeatTransactionUsers('withdrawal', $this->topLimit, $startDate, $endDate);
+        } catch (\Exception $e) {
+            return collect();
+        }
     }
 
     public function render()
