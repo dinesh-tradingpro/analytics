@@ -36,6 +36,9 @@ class UserAnalyticsCache extends Model
         'new_users_new' => 'new_users_new',
         'active_users_new' => 'active_users_new',
         'inactive_users_new' => 'inactive_users_new',
+        // Daily snapshot metrics
+        'active_users_daily' => 'active_users_daily',
+        'inactive_users_daily' => 'inactive_users_daily',
     ];
 
     /**
@@ -85,5 +88,53 @@ class UserAnalyticsCache extends Model
                 'synced_at' => now(),
             ]
         );
+    }
+
+    /**
+     * Get daily snapshots for a date range
+     */
+    public static function getDailySnapshots($metricType, $startDate = null, $endDate = null, $limit = 365)
+    {
+        $query = self::where('metric_type', $metricType)
+            ->orderBy('data_date', 'desc');
+
+        if ($startDate) {
+            $query->where('data_date', '>=', $startDate);
+        }
+
+        if ($endDate) {
+            $query->where('data_date', '<=', $endDate);
+        }
+
+        return $query->limit($limit)->get();
+    }
+
+    /**
+     * Get combined chart data from daily snapshots
+     */
+    public static function getCombinedDailyChartData($metricType, $startDate = null, $endDate = null, $limit = 365)
+    {
+        $snapshots = self::getDailySnapshots($metricType, $startDate, $endDate, $limit);
+
+        $combinedData = [];
+        $latestCount = 0;
+
+        foreach ($snapshots as $snapshot) {
+            $date = $snapshot->data_date->format('Y-m-d');
+            $combinedData[$date] = $snapshot->total_count;
+        }
+
+        ksort($combinedData);
+
+        // Get the most recent day's count as the "current" count
+        if (! empty($combinedData)) {
+            $latestCount = end($combinedData);
+        }
+
+        return [
+            'chart_data' => $combinedData,
+            'total_count' => $latestCount, // Changed: returns latest day's count, not sum
+            'record_count' => count($combinedData),
+        ];
     }
 }

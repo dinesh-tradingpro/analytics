@@ -64,23 +64,26 @@ class SyncUsers extends Command
 
     private function syncActiveUsers($controller)
     {
-        $this->info('📊 Syncing active users data (firstDepositDate not null + lastLoginDate = today)...');
+        $this->info('📊 Syncing active users data (daily snapshot: firstDepositDate not null + lastLoginDate = today)...');
 
-        // Check if we need to refresh
-        $existingCache = UserAnalyticsCache::getLatest('active_users_new');
-        if ($existingCache && ! $existingCache->isStale(60) && ! $this->option('force')) {
-            $this->info('⏭️  Active users data is fresh, skipping...');
+        $today = date('Y-m-d');
+
+        // Check if today's snapshot already exists
+        $existingCache = UserAnalyticsCache::where('metric_type', 'active_users_daily')
+            ->whereDate('data_date', $today)
+            ->first();
+
+        if ($existingCache && ! $this->option('force')) {
+            $this->info("⏭️  Today's active users snapshot already exists (count: {$existingCache->total_count}), skipping...");
 
             return;
         }
 
-        $activityGroups = [];
         $totalActiveUsers = 0;
         $totalFetched = 0;
         $offset = 0;
         $batchSize = 2000;
         $hasMoreData = true;
-        $today = date('Y-m-d');
 
         while ($hasMoreData) {
             $this->info("📥 Fetching batch at offset {$offset}...");
@@ -113,7 +116,6 @@ class SyncUsers extends Command
                     $lastLoginDate = date('Y-m-d', strtotime($user['lastLoginDate']));
                     if ($lastLoginDate === $today) {
                         $totalActiveUsers++;
-                        $activityGroups[$today] = ($activityGroups[$today] ?? 0) + 1;
                     }
                 }
             }
@@ -130,17 +132,25 @@ class SyncUsers extends Command
 
         $this->info("🔍 Found {$totalActiveUsers} active users from {$totalFetched} total records");
 
-        ksort($activityGroups);
-
-        UserAnalyticsCache::updateOrCreateCache(
-            'active_users_new',
-            $activityGroups,
-            $totalActiveUsers,
-            ['active_users_today' => $totalActiveUsers, 'date' => $today],
-            $totalFetched
+        // Store today's snapshot - this will preserve previous days' records
+        UserAnalyticsCache::updateOrCreate(
+            [
+                'metric_type' => 'active_users_daily',
+                'data_date' => $today,
+            ],
+            [
+                'chart_data' => [$today => $totalActiveUsers],
+                'total_count' => $totalActiveUsers,
+                'metadata' => [
+                    'snapshot_date' => $today,
+                    'description' => 'Daily active users snapshot',
+                ],
+                'total_records_fetched' => $totalFetched,
+                'synced_at' => now(),
+            ]
         );
 
-        $this->info('✅ Active users data cached successfully');
+        $this->info("✅ Active users daily snapshot cached successfully: {$today} => {$totalActiveUsers} users");
     }
 
     private function syncNewUsers($controller)
@@ -230,24 +240,27 @@ class SyncUsers extends Command
 
     private function syncInactiveUsers($controller)
     {
-        $this->info('📊 Syncing inactive users data (firstDepositDate not null, grouped by last login date and trading status)...');
+        $this->info('📊 Syncing inactive users data (daily snapshot: firstDepositDate not null + lastLoginDate != today)...');
 
-        // Check if we need to refresh
-        $existingCache = UserAnalyticsCache::getLatest('inactive_users_new');
-        if ($existingCache && ! $existingCache->isStale(60) && ! $this->option('force')) {
-            $this->info('⏭️  Inactive users data is fresh, skipping...');
+        $today = date('Y-m-d');
+
+        // Check if today's snapshot already exists
+        $existingCache = UserAnalyticsCache::where('metric_type', 'inactive_users_daily')
+            ->whereDate('data_date', $today)
+            ->first();
+
+        if ($existingCache && ! $this->option('force')) {
+            $this->info("⏭️  Today's inactive users snapshot already exists (count: {$existingCache->total_count}), skipping...");
 
             return;
         }
 
-        $inactivityGroups = [];
         $statusBreakdown = [];
         $totalInactiveUsers = 0;
         $totalFetched = 0;
         $offset = 0;
         $batchSize = 2000;
         $hasMoreData = true;
-        $today = date('Y-m-d');
 
         while ($hasMoreData) {
             $this->info("📥 Fetching batch at offset {$offset}...");
@@ -287,14 +300,6 @@ class SyncUsers extends Command
                 if ($isInactive) {
                     $totalInactiveUsers++;
 
-                    // Group by last login date
-                    if (isset($user['lastLoginDate'])) {
-                        $date = date('Y-m-d', strtotime($user['lastLoginDate']));
-                        $inactivityGroups[$date] = ($inactivityGroups[$date] ?? 0) + 1;
-                    } else {
-                        $inactivityGroups['never'] = ($inactivityGroups['never'] ?? 0) + 1;
-                    }
-
                     // Group by trading status
                     $tradingStatus = $user['tradingStatus'] ?? 'unknown';
                     $statusBreakdown[$tradingStatus] = ($statusBreakdown[$tradingStatus] ?? 0) + 1;
@@ -314,24 +319,25 @@ class SyncUsers extends Command
         $this->info("🔍 Found {$totalInactiveUsers} inactive users from {$totalFetched} total records");
         $this->info('📈 Status breakdown: '.json_encode($statusBreakdown));
 
-        ksort($inactivityGroups);
-
-        $metadata = [
-            'inactive_users_breakdown' => [
-                'never_logged_in' => $inactivityGroups['never'] ?? 0,
-                'total_with_login_history' => $totalInactiveUsers - ($inactivityGroups['never'] ?? 0),
+        // Store today's snapshot - this will preserve previous days' records
+        UserAnalyticsCache::updateOrCreate(
+            [
+                'metric_type' => 'inactive_users_daily',
+                'data_date' => $today,
             ],
-            'trading_status_breakdown' => $statusBreakdown,
-        ];
-
-        UserAnalyticsCache::updateOrCreateCache(
-            'inactive_users_new',
-            $inactivityGroups,
-            $totalInactiveUsers,
-            $metadata,
-            $totalFetched
+            [
+                'chart_data' => [$today => $totalInactiveUsers],
+                'total_count' => $totalInactiveUsers,
+                'metadata' => [
+                    'snapshot_date' => $today,
+                    'description' => 'Daily inactive users snapshot',
+                    'trading_status_breakdown' => $statusBreakdown,
+                ],
+                'total_records_fetched' => $totalFetched,
+                'synced_at' => now(),
+            ]
         );
 
-        $this->info('✅ Inactive users data cached successfully');
+        $this->info("✅ Inactive users daily snapshot cached successfully: {$today} => {$totalInactiveUsers} users");
     }
 }

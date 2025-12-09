@@ -93,7 +93,7 @@
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Inactive Users</h3>
                 <div class="flex items-center space-x-2">
                     <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span class="text-sm text-gray-500 dark:text-gray-400">No recent activity</span>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">Last 30 days</span>
                 </div>
             </div>
 
@@ -126,21 +126,21 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="text-center">
                 <div class="text-2xl font-bold text-gray-900 dark:text-white">
-                    {{ number_format($newUsers->total_count ?? 0) }}
+                    {{ number_format($newUsersToday) }}
                 </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Total new users</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">New users today</p>
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {{ number_format(($newUsers->metadata['daily_average'] ?? 0), 1) }}
+                    {{ number_format($newUsersLast7DaysAvg, 1) }}
                 </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Daily average</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Last 7 days average</p>
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {{ number_format(($newUsers->metadata['weekly_average'] ?? 0), 1) }}
+                    {{ number_format($newUsersThisMonthAvg, 1) }}
                 </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Weekly average</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">This month average</p>
             </div>
         </div>
 
@@ -175,12 +175,58 @@
     <!-- Inactive Users Status Breakdown -->
     @if (count($inactiveUsersStatusBreakdownData['labels'] ?? []) > 0)
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">User Distribution</h3>
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">User Distribution by Status</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Breakdown of inactive users by trading status</p>
             </div>
 
-            <div class="h-80">
-                <canvas id="inactiveUsersStatusChart" width="400" height="200"></canvas>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Chart -->
+                <div class="flex items-center justify-center">
+                    <div class="w-full max-w-sm">
+                        <canvas id="inactiveUsersStatusChart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Legend Cards -->
+                <div class="space-y-3">
+                    @php
+                        $labels = $inactiveUsersStatusBreakdownData['labels'] ?? [];
+                        $data = $inactiveUsersStatusBreakdownData['data'] ?? [];
+                        $total = array_sum($data);
+                        $colors = [
+                            'rgb(239, 68, 68)',
+                            'rgb(245, 158, 11)',
+                            'rgb(34, 197, 94)',
+                            'rgb(59, 130, 246)',
+                            'rgb(168, 85, 247)',
+                            'rgb(236, 72, 153)'
+                        ];
+                    @endphp
+                    @foreach($labels as $index => $label)
+                                    @php
+                                        $value = $data[$index] ?? 0;
+                                        $percentage = $total > 0 ? round(($value / $total) * 100, 1) : 0;
+                                    @endphp
+                         <div
+                                        class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow duration-200">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-4 h-4 rounded-full"
+                                                    style="background-color: {{ $colors[$index] ?? 'rgb(156, 163, 175)' }}"></div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ ucfirst($label) }}</p>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ number_format($value) }} users
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $percentage }}%</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                    @endforeach
+                </div>
             </div>
         </div>
     @endif
@@ -210,7 +256,16 @@
                         data: @js($activeUsersChartData['data'] ?? []),
                         borderColor: 'rgb(59, 130, 246)',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.1
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: 'rgb(59, 130, 246)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: 'rgb(59, 130, 246)',
+                        pointHoverBorderColor: '#fff'
                     }]
                 },
                 options: {
@@ -219,18 +274,36 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                 label: function (context) {
+                                    return 'Active Users: ' + context.parsed.y.toLocaleString();
+                                }
+                            }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
+                            ticks: {
+                                 callback: function (value) {
+                                    return value.toLocaleString();
+                                }
+                            },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.1)'
                             }
                         },
                         x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                autoSkip: true,
+                                maxTicksLimit: 15
+                            },
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                color: 'rgba(0, 0, 0, 0.05)'
                             }
                         }
                     }
@@ -250,7 +323,16 @@
                         data: @js($inactiveUsersChartData['data'] ?? []),
                         borderColor: 'rgb(239, 68, 68)',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        tension: 0.1
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: 'rgb(239, 68, 68)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: 'rgb(239, 68, 68)',
+                        pointHoverBorderColor: '#fff'
                     }]
                 },
                 options: {
@@ -259,18 +341,36 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            callbacks: { 
+                                label: function (context) {
+                                    return 'Inactive Users: ' + context.parsed.y.toLocaleString();
+                                }
+                            }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
+                            ticks: {
+                                 callback: function (value) {
+                                    return value.toLocaleString();
+                                }
+                            },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.1)'
                             }
                         },
                         x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                autoSkip: true,
+                                maxTicksLimit: 15
+                            },
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                color: 'rgba(0, 0, 0, 0.05)'
                             }
                         }
                     }
@@ -281,6 +381,10 @@
         // New Users Weekly Chart
         const weeklyCtx = document.getElementById('newUsersWeeklyChart');
         if (weeklyCtx) {
+            const weeklyGradient = weeklyCtx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+            weeklyGradient.addColorStop(0, 'rgba(34, 197, 94, 0.8)');
+            weeklyGradient.addColorStop(1, 'rgba(34, 197, 94, 0.2)');
+
             newUsersWeeklyChart = new Chart(weeklyCtx, {
                 type: 'bar',
                 data: {
@@ -288,9 +392,11 @@
                     datasets: [{
                         label: 'New Users',
                         data: @js($newUsersWeeklyChartData['data'] ?? []),
-                        backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                        backgroundColor: weeklyGradient,
                         borderColor: 'rgb(34, 197, 94)',
-                        borderWidth: 1
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
                 options: {
@@ -299,18 +405,35 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'New Users: ' + context.parsed.y.toLocaleString();
+                                }
+                            }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                padding: 10
                             }
                         },
                         x: {
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                display: false
+                            },
+                            ticks: {
+                                padding: 10
                             }
                         }
                     }
@@ -321,6 +444,10 @@
         // New Users Monthly Chart
         const monthlyCtx = document.getElementById('newUsersMonthlyChart');
         if (monthlyCtx) {
+            const monthlyGradient = monthlyCtx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+            monthlyGradient.addColorStop(0, 'rgba(168, 85, 247, 0.8)');
+            monthlyGradient.addColorStop(1, 'rgba(168, 85, 247, 0.2)');
+
             newUsersMonthlyChart = new Chart(monthlyCtx, {
                 type: 'bar',
                 data: {
@@ -328,9 +455,11 @@
                     datasets: [{
                         label: 'New Users',
                         data: @js($newUsersMonthlyChartData['data'] ?? []),
-                        backgroundColor: 'rgba(168, 85, 247, 0.8)',
+                        backgroundColor: monthlyGradient,
                         borderColor: 'rgb(168, 85, 247)',
-                        borderWidth: 1
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
                 options: {
@@ -339,18 +468,35 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'New Users: ' + context.parsed.y.toLocaleString();
+                                }
+                            }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                padding: 10
                             }
                         },
                         x: {
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                display: false
+                            },
+                            ticks: {
+                                padding: 10
                             }
                         }
                     }
@@ -361,6 +507,10 @@
         // New Users Each Month Chart
         const eachMonthCtx = document.getElementById('newUsersEachMonthChart');
         if (eachMonthCtx) {
+            const eachMonthGradient = eachMonthCtx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+            eachMonthGradient.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
+            eachMonthGradient.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+
             newUsersEachMonthChart = new Chart(eachMonthCtx, {
                 type: 'line',
                 data: {
@@ -369,8 +519,18 @@
                         label: 'New Users',
                         data: @js($newUsersEachMonthChartData['data'] ?? []),
                         borderColor: 'rgb(245, 158, 11)',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.1
+                        backgroundColor: eachMonthGradient,
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: 'rgb(245, 158, 11)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: 'rgb(245, 158, 11)',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
                     }]
                 },
                 options: {
@@ -379,18 +539,40 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'New Users: ' + context.parsed.y.toLocaleString();
+                                }
+                            }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                padding: 10,
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                          }
                             }
                         },
                         x: {
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                display: false
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                padding: 10
                             }
                         }
                     }
@@ -401,12 +583,15 @@
         // Inactive Users Status Chart
         const statusCtx = document.getElementById('inactiveUsersStatusChart');
         if (statusCtx && @js($inactiveUsersStatusBreakdownData['labels'] ?? []).length > 0) {
+            const statusData = @js($inactiveUsersStatusBreakdownData['data'] ?? []);
+            const statusTotal = statusData.reduce((a, b) => a + b, 0);
+
             inactiveUsersStatusChart = new Chart(statusCtx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: @js($inactiveUsersStatusBreakdownData['labels'] ?? []),
                     datasets: [{
-                        data: @js($inactiveUsersStatusBreakdownData['data'] ?? []),
+                        data: statusData,
                         backgroundColor: [
                             'rgba(239, 68, 68, 0.8)',
                             'rgba(245, 158, 11, 0.8)',
@@ -415,23 +600,41 @@
                             'rgba(168, 85, 247, 0.8)',
                             'rgba(236, 72, 153, 0.8)'
                         ],
-                        borderColor: [
-                            'rgb(239, 68, 68)',
-                            'rgb(245, 158, 11)',
-                            'rgb(34, 197, 94)',
-                            'rgb(59, 130, 246)',
-                            'rgb(168, 85, 247)',
-                            'rgb(236, 72, 153)'
-                        ],
-                        borderWidth: 1
+                        borderColor: '#fff',
+                        borderWidth: 3,
+                        hoverOffset: 15,
+                        hoverBorderWidth: 3
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
+                    cutout: '65%',
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const percentage = ((value / statusTotal) * 100).toFixed(1);
+                                    return [
+                                        context.label + ': ' + value.toLocaleString() + ' users',
+                                        'Percentage: ' + percentage + '%'
+                                    ];
+                                }
+                            }
                         }
                     }
                 }

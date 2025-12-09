@@ -37,6 +37,13 @@ class UserAnalyticsSimple extends Component
 
     public $newUsersAllTimeChartData = [];
 
+    // Computed metrics
+    public $newUsersToday = 0;
+
+    public $newUsersLast7DaysAvg = 0;
+
+    public $newUsersThisMonthAvg = 0;
+
     public function mount()
     {
         $this->loadAnalyticsData();
@@ -67,10 +74,27 @@ class UserAnalyticsSimple extends Component
         $this->loading = true;
 
         try {
-            // Load cached data for each metric type
-            $this->activeUsers = UserAnalyticsCache::getLatest('active_users_new') ?? [];
+            // Load daily snapshots for active users (last 365 days)
+            $activeUsersData = UserAnalyticsCache::getCombinedDailyChartData('active_users_daily', null, null, 365);
+            $this->activeUsers = (object) [
+                'chart_data' => $activeUsersData['chart_data'],
+                'total_count' => $activeUsersData['total_count'],
+                'metadata' => ['snapshot_count' => $activeUsersData['record_count']],
+            ];
+
+            // Load daily snapshots for inactive users (last 365 days)
+            $inactiveUsersData = UserAnalyticsCache::getCombinedDailyChartData('inactive_users_daily', null, null, 365);
+            $this->inactiveUsers = (object) [
+                'chart_data' => $inactiveUsersData['chart_data'],
+                'total_count' => $inactiveUsersData['total_count'],
+                'metadata' => ['snapshot_count' => $inactiveUsersData['record_count']],
+            ];
+
+            // Load cached data for other metrics
             $this->newUsers = UserAnalyticsCache::getLatest('new_users_new') ?? [];
-            $this->inactiveUsers = UserAnalyticsCache::getLatest('inactive_users_new') ?? [];
+
+            // Calculate new users metrics
+            $this->calculateNewUsersMetrics();
 
             // Prepare chart data for each section
             $this->prepareActiveUsersChart();
@@ -87,22 +111,68 @@ class UserAnalyticsSimple extends Component
     protected function prepareActiveUsersChart()
     {
         $data = $this->activeUsers->chart_data ?? [];
-        $this->activeUsersChartData = $this->formatChartData($data, 'all');
+        // For daily snapshots, show each day individually
+        $this->activeUsersChartData = [
+            'labels' => array_keys($data),
+            'data' => array_values($data),
+        ];
     }
 
     protected function prepareInactiveUsersChart()
     {
         $data = $this->inactiveUsers->chart_data ?? [];
-        $this->inactiveUsersChartData = $this->formatChartData($data, 'all');
+        // For daily snapshots, show each day individually
+        $this->inactiveUsersChartData = [
+            'labels' => array_keys($data),
+            'data' => array_values($data),
+        ];
 
-        // Prepare status breakdown data
-        $metadata = $this->inactiveUsers->metadata ?? [];
+        // Get the latest snapshot's status breakdown for the pie chart
+        $latestSnapshot = UserAnalyticsCache::where('metric_type', 'inactive_users_daily')
+            ->orderBy('data_date', 'desc')
+            ->first();
+
+        $metadata = $latestSnapshot->metadata ?? [];
         $statusBreakdown = $metadata['trading_status_breakdown'] ?? [];
 
         $this->inactiveUsersStatusBreakdownData = [
             'labels' => array_keys($statusBreakdown),
             'data' => array_values($statusBreakdown),
         ];
+    }
+
+    protected function calculateNewUsersMetrics()
+    {
+        $data = $this->newUsers->chart_data ?? [];
+        $today = \Carbon\Carbon::now()->format('Y-m-d');
+
+        // Get today's count
+        $this->newUsersToday = $data[$today] ?? 0;
+
+        // Calculate last 7 days average
+        $last7DaysTotal = 0;
+        $last7DaysCount = 0;
+        for ($i = 0; $i < 7; $i++) {
+            $date = \Carbon\Carbon::now()->subDays($i)->format('Y-m-d');
+            if (isset($data[$date])) {
+                $last7DaysTotal += $data[$date];
+                $last7DaysCount++;
+            }
+        }
+        $this->newUsersLast7DaysAvg = $last7DaysCount > 0 ? round($last7DaysTotal / $last7DaysCount, 1) : 0;
+
+        // Calculate this month average
+        $currentMonth = \Carbon\Carbon::now()->format('Y-m');
+        $thisMonthTotal = 0;
+        $thisMonthCount = 0;
+        foreach ($data as $date => $count) {
+            $month = \Carbon\Carbon::parse($date)->format('Y-m');
+            if ($month === $currentMonth) {
+                $thisMonthTotal += $count;
+                $thisMonthCount++;
+            }
+        }
+        $this->newUsersThisMonthAvg = $thisMonthCount > 0 ? round($thisMonthTotal / $thisMonthCount, 1) : 0;
     }
 
     protected function prepareNewUsersCharts()
