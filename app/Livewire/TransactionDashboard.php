@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\TransactionAnalyticsCache;
 use App\Models\TransactionDetail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -104,58 +105,61 @@ class TransactionDashboard extends Component
     #[Computed]
     public function transactionStats()
     {
-        try {
-            // Get real transaction data from TransactionDetail model
-            $depositApproved = TransactionDetail::selectRaw('
-                COUNT(*) as count,
-                SUM(processed_amount) as total_amount,
-                AVG(processed_amount) as avg_amount
-            ')
-                ->where('transaction_type', 'deposit')
-                ->where('status', 'approved')
-                ->first();
+        // Cache for 15 minutes to avoid heavy queries on every page load
+        return Cache::remember('transaction_stats', 900, function () {
+            try {
+                // Get real transaction data from TransactionDetail model
+                $depositApproved = TransactionDetail::selectRaw('
+                    COUNT(*) as count,
+                    SUM(processed_amount) as total_amount,
+                    AVG(processed_amount) as avg_amount
+                ')
+                    ->where('transaction_type', 'deposit')
+                    ->where('status', 'approved')
+                    ->first();
 
-            $withdrawalApproved = TransactionDetail::selectRaw('
-                COUNT(*) as count,
-                SUM(processed_amount) as total_amount,
-                AVG(processed_amount) as avg_amount
-            ')
-                ->where('transaction_type', 'withdrawal')
-                ->where('status', 'approved')
-                ->first();
+                $withdrawalApproved = TransactionDetail::selectRaw('
+                    COUNT(*) as count,
+                    SUM(processed_amount) as total_amount,
+                    AVG(processed_amount) as avg_amount
+                ')
+                    ->where('transaction_type', 'withdrawal')
+                    ->where('status', 'approved')
+                    ->first();
 
-            $depositDeclined = TransactionDetail::selectRaw('COUNT(*) as count')
-                ->where('transaction_type', 'deposit')
-                ->where('status', 'declined')
-                ->first();
+                $depositDeclined = TransactionDetail::selectRaw('COUNT(*) as count')
+                    ->where('transaction_type', 'deposit')
+                    ->where('status', 'declined')
+                    ->first();
 
-            $withdrawalDeclined = TransactionDetail::selectRaw('COUNT(*) as count')
-                ->where('transaction_type', 'withdrawal')
-                ->where('status', 'declined')
-                ->first();
+                $withdrawalDeclined = TransactionDetail::selectRaw('COUNT(*) as count')
+                    ->where('transaction_type', 'withdrawal')
+                    ->where('status', 'declined')
+                    ->first();
 
-            return [
-                'deposit_approved' => $depositApproved,
-                'withdrawal_approved' => $withdrawalApproved,
-                'deposit_declined' => $depositDeclined,
-                'withdrawal_declined' => $withdrawalDeclined,
-                'total_approved_amount' => ($depositApproved->total_amount ?? 0) + ($withdrawalApproved->total_amount ?? 0),
-                'total_approved_count' => ($depositApproved->count ?? 0) + ($withdrawalApproved->count ?? 0),
-                'total_declined_count' => ($depositDeclined->count ?? 0) + ($withdrawalDeclined->count ?? 0),
-                'total_all_count' => ($depositApproved->count ?? 0) + ($withdrawalApproved->count ?? 0) + ($depositDeclined->count ?? 0) + ($withdrawalDeclined->count ?? 0),
-            ];
-        } catch (\Exception $e) {
-            return [
-                'deposit_approved' => null,
-                'withdrawal_approved' => null,
-                'deposit_declined' => null,
-                'withdrawal_declined' => null,
-                'total_approved_amount' => 0,
-                'total_approved_count' => 0,
-                'total_declined_count' => 0,
-                'total_all_count' => 0,
-            ];
-        }
+                return [
+                    'deposit_approved' => $depositApproved,
+                    'withdrawal_approved' => $withdrawalApproved,
+                    'deposit_declined' => $depositDeclined,
+                    'withdrawal_declined' => $withdrawalDeclined,
+                    'total_approved_amount' => ($depositApproved->total_amount ?? 0) + ($withdrawalApproved->total_amount ?? 0),
+                    'total_approved_count' => ($depositApproved->count ?? 0) + ($withdrawalApproved->count ?? 0),
+                    'total_declined_count' => ($depositDeclined->count ?? 0) + ($withdrawalDeclined->count ?? 0),
+                    'total_all_count' => ($depositApproved->count ?? 0) + ($withdrawalApproved->count ?? 0) + ($depositDeclined->count ?? 0) + ($withdrawalDeclined->count ?? 0),
+                ];
+            } catch (\Exception $e) {
+                return [
+                    'deposit_approved' => null,
+                    'withdrawal_approved' => null,
+                    'deposit_declined' => null,
+                    'withdrawal_declined' => null,
+                    'total_approved_amount' => 0,
+                    'total_approved_count' => 0,
+                    'total_declined_count' => 0,
+                    'total_all_count' => 0,
+                ];
+            }
+        });
     }
 
     #[Computed]
@@ -177,17 +181,30 @@ class TransactionDashboard extends Component
     #[Computed]
     public function successRates()
     {
-        $totalDeposits = ($this->depositsApproved->total_count ?? 0) + ($this->depositsDeclined->total_count ?? 0);
-        $totalWithdrawals = ($this->withdrawalsApproved->total_count ?? 0) + ($this->withdrawalsDeclined->total_count ?? 0);
+        $depositApproved = $this->depositsApproved->total_count ?? 0;
+        $depositDeclined = $this->depositsDeclined->total_count ?? 0;
+        $withdrawalApproved = $this->withdrawalsApproved->total_count ?? 0;
+        $withdrawalDeclined = $this->withdrawalsDeclined->total_count ?? 0;
+        
+        $totalDeposits = $depositApproved + $depositDeclined;
+        $totalWithdrawals = $withdrawalApproved + $withdrawalDeclined;
+        $totalApproved = $depositApproved + $withdrawalApproved;
+        $totalAll = $totalDeposits + $totalWithdrawals;
 
-        $depositSuccessRate = $totalDeposits > 0 ? round((($this->depositsApproved->total_count ?? 0) / $totalDeposits) * 100, 2) : 0;
-        $withdrawalSuccessRate = $totalWithdrawals > 0 ? round((($this->withdrawalsApproved->total_count ?? 0) / $totalWithdrawals) * 100, 2) : 0;
+        $depositSuccessRate = $totalDeposits > 0 ? round(($depositApproved / $totalDeposits) * 100, 2) : 0;
+        $withdrawalSuccessRate = $totalWithdrawals > 0 ? round(($withdrawalApproved / $totalWithdrawals) * 100, 2) : 0;
+        $overallSuccessRate = $totalAll > 0 ? round(($totalApproved / $totalAll) * 100, 2) : 0;
 
         return [
             'deposit_success_rate' => $depositSuccessRate,
+            'deposit_approved' => $depositApproved,
+            'deposit_total' => $totalDeposits,
             'withdrawal_success_rate' => $withdrawalSuccessRate,
-            'overall_success_rate' => ($totalDeposits + $totalWithdrawals) > 0 ?
-                round(((($this->depositsApproved->total_count ?? 0) + ($this->withdrawalsApproved->total_count ?? 0)) / ($totalDeposits + $totalWithdrawals)) * 100, 2) : 0,
+            'withdrawal_approved' => $withdrawalApproved,
+            'withdrawal_total' => $totalWithdrawals,
+            'overall_success_rate' => $overallSuccessRate,
+            'overall_approved' => $totalApproved,
+            'overall_total' => $totalAll,
         ];
     }
 
@@ -262,19 +279,25 @@ class TransactionDashboard extends Component
     #[Computed]
     public function monthlyVolumeData()
     {
-        $startDate = now()->startOfMonth();
-        $endDate = now()->endOfMonth();
+        // Cache for 15 minutes since this queries cached analytics data
+        return Cache::remember('monthly_volume_data', 900, function () {
+            $startDate = now()->startOfMonth();
+            $endDate = now()->endOfMonth();
 
-        return $this->getVolumeDataForPeriod($startDate, $endDate, 'daily');
+            return $this->getVolumeDataForPeriod($startDate, $endDate, 'daily');
+        });
     }
 
     #[Computed]
     public function weeklyVolumeData()
     {
-        $startDate = now()->subDays(6)->startOfDay();
-        $endDate = now()->endOfDay();
+        // Cache for 15 minutes since this queries cached analytics data
+        return Cache::remember('weekly_volume_data', 900, function () {
+            $startDate = now()->subDays(6)->startOfDay();
+            $endDate = now()->endOfDay();
 
-        return $this->getVolumeDataForPeriod($startDate, $endDate, 'daily');
+            return $this->getVolumeDataForPeriod($startDate, $endDate, 'daily');
+        });
     }
 
     private function getVolumeDataForPeriod($startDate, $endDate, $groupBy = 'daily')
@@ -384,53 +407,73 @@ class TransactionDashboard extends Component
     #[Computed]
     public function topDeposits()
     {
-        try {
-            $endDate = Carbon::now();
-            $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+        // Cache based on date range and limit to avoid heavy queries
+        $cacheKey = "top_deposits_{$this->dateRange}_{$this->topLimit}";
 
-            return TransactionDetail::getTopTransactions('deposit', $this->topLimit, $startDate, $endDate);
-        } catch (\Exception $e) {
-            return collect();
-        }
+        return Cache::remember($cacheKey, 900, function () {
+            try {
+                $endDate = Carbon::now();
+                $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+
+                return TransactionDetail::getTopTransactions('deposit', $this->topLimit, $startDate, $endDate);
+            } catch (\Exception $e) {
+                return collect();
+            }
+        });
     }
 
     #[Computed]
     public function topWithdrawals()
     {
-        try {
-            $endDate = Carbon::now();
-            $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+        // Cache based on date range and limit to avoid heavy queries
+        $cacheKey = "top_withdrawals_{$this->dateRange}_{$this->topLimit}";
 
-            return TransactionDetail::getTopTransactions('withdrawal', $this->topLimit, $startDate, $endDate);
-        } catch (\Exception $e) {
-            return collect();
-        }
+        return Cache::remember($cacheKey, 900, function () {
+            try {
+                $endDate = Carbon::now();
+                $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+
+                return TransactionDetail::getTopTransactions('withdrawal', $this->topLimit, $startDate, $endDate);
+            } catch (\Exception $e) {
+                return collect();
+            }
+        });
     }
 
     #[Computed]
     public function repeatDepositUsers()
     {
-        try {
-            $endDate = Carbon::now();
-            $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+        // Cache based on date range and limit to avoid heavy GROUP BY queries
+        $cacheKey = "repeat_deposit_users_{$this->dateRange}_{$this->topLimit}";
 
-            return TransactionDetail::getRepeatTransactionUsers('deposit', $this->topLimit, $startDate, $endDate);
-        } catch (\Exception $e) {
-            return collect();
-        }
+        return Cache::remember($cacheKey, 900, function () {
+            try {
+                $endDate = Carbon::now();
+                $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+
+                return TransactionDetail::getRepeatTransactionUsers('deposit', $this->topLimit, $startDate, $endDate);
+            } catch (\Exception $e) {
+                return collect();
+            }
+        });
     }
 
     #[Computed]
     public function repeatWithdrawalUsers()
     {
-        try {
-            $endDate = Carbon::now();
-            $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+        // Cache based on date range and limit to avoid heavy GROUP BY queries
+        $cacheKey = "repeat_withdrawal_users_{$this->dateRange}_{$this->topLimit}";
 
-            return TransactionDetail::getRepeatTransactionUsers('withdrawal', $this->topLimit, $startDate, $endDate);
-        } catch (\Exception $e) {
-            return collect();
-        }
+        return Cache::remember($cacheKey, 900, function () {
+            try {
+                $endDate = Carbon::now();
+                $startDate = $endDate->copy()->subDays((int) $this->dateRange);
+
+                return TransactionDetail::getRepeatTransactionUsers('withdrawal', $this->topLimit, $startDate, $endDate);
+            } catch (\Exception $e) {
+                return collect();
+            }
+        });
     }
 
     public function render()
