@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class Ticket extends Model
 {
@@ -52,7 +51,7 @@ class Ticket extends Model
         $days = max(1, $days);
         $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
 
-        $rows = static::selectRaw("ticket_date, COUNT(*) as total")
+        $rows = static::selectRaw('ticket_date, COUNT(*) as total')
             ->whereNotNull('ticket_date')
             ->where('ticket_date', '>=', $startDate->toDateString())
             ->groupBy('ticket_date')
@@ -84,7 +83,7 @@ class Ticket extends Model
      */
     public static function dailyCountsAll(): array
     {
-        $rows = static::selectRaw("ticket_date, COUNT(*) as total")
+        $rows = static::selectRaw('ticket_date, COUNT(*) as total')
             ->whereNotNull('ticket_date')
             ->groupBy('ticket_date')
             ->orderBy('ticket_date')
@@ -159,9 +158,14 @@ class Ticket extends Model
 
         foreach ($rows as $row) {
             $i = array_search($row->category, $labels, true);
-            if ($i === false) continue;
-            if ($row->status_group === 'open') $openData[$i] = (int) $row->total;
-            elseif ($row->status_group === 'closed') $closedData[$i] = (int) $row->total;
+            if ($i === false) {
+                continue;
+            }
+            if ($row->status_group === 'open') {
+                $openData[$i] = (int) $row->total;
+            } elseif ($row->status_group === 'closed') {
+                $closedData[$i] = (int) $row->total;
+            }
         }
 
         $totals = [];
@@ -204,5 +208,40 @@ class Ticket extends Model
         }
 
         return (float) $result->avg_hours;
+    }
+
+    /**
+     * Count manager responses from comments for a given time range.
+     * Only counts responses where comment.manager is set (not null).
+     * Returns array of manager_id => response_count.
+     */
+    public static function managerResponseCounts(int $days): array
+    {
+        $startDate = Carbon::now()->subDays($days)->startOfDay();
+
+        $rows = static::where('created_at_api', '>=', $startDate)
+            ->whereNotNull('metadata')
+            ->get(['metadata']);
+
+        $managerCounts = [];
+
+        foreach ($rows as $row) {
+            $metadata = $row->metadata;
+            if (! is_array($metadata) || ! isset($metadata['comments']) || ! is_array($metadata['comments'])) {
+                continue;
+            }
+
+            foreach ($metadata['comments'] as $comment) {
+                if (is_array($comment) && isset($comment['manager']) && $comment['manager'] !== null) {
+                    $managerId = $comment['manager'];
+                    $managerCounts[$managerId] = ($managerCounts[$managerId] ?? 0) + 1;
+                }
+            }
+        }
+
+        // Sort by count descending, then by manager_id
+        arsort($managerCounts);
+
+        return $managerCounts;
     }
 }

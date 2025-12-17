@@ -6,6 +6,7 @@
         'user-analytics' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
         'transactions' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
         'tickets' => 'M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z',
+        'managers' => 'M12 4.354a4 4 0 110 8.646 4 4 0 010-8.646zM9 14H5a4 4 0 00-4 4v2h6v-6zm8 0h4a4 4 0 014 4v2h-6v-6zm-9-10a3 3 0 11-6 0 3 3 0 016 0z',
         'default' => 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6'
     ];
 
@@ -14,6 +15,7 @@
         'user-analytics' => 'Users',
         'transactions' => 'Transactions',
         'tickets' => 'Tickets',
+        'managers' => 'Managers',
         'default' => 'Beta'
     ];
 
@@ -24,7 +26,8 @@
         ['route' => route('dashboard'), 'label' => 'Dashboard', 'key' => 'dashboard'],
         ['route' => route('user-analytics'), 'label' => 'Users', 'key' => 'user-analytics'],
         ['route' => route('transactions'), 'label' => 'Transactions', 'key' => 'transactions'],
-        ['route' => route('tickets'), 'label' => 'Tickets', 'key' => 'tickets']
+        ['route' => route('tickets'), 'label' => 'Tickets', 'key' => 'tickets'],
+        ['route' => route('managers'), 'label' => 'Managers', 'key' => 'managers']
     ];
 
     $menuItems = [

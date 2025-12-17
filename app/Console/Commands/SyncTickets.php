@@ -117,20 +117,35 @@ class SyncTickets extends Command
                         }
                     }
                     $ticketDate = $createdAt ? $createdAt->toDateString() : null;
-                    
+
                     // Extract closed_at from comments
                     $closedAt = $this->extractClosedTimestamp($ticket);
-                    
+
                     // Map category title from API to our canonical set (title only)
                     [$categoryId, $categoryTitle] = $this->mapCategory($ticket);
+
+                    // Extract comments data to store manager response information
+                    $comments = [];
+                    if (! empty($ticket['comments']) && is_array($ticket['comments'])) {
+                        foreach ($ticket['comments'] as $comment) {
+                            if (is_array($comment)) {
+                                $comments[] = [
+                                    'manager' => $comment['manager'] ?? null,
+                                    'text' => $comment['text'] ?? null,
+                                    'createdAt' => $comment['createdAt'] ?? null,
+                                ];
+                            }
+                        }
+                    }
 
                     $metadata = [
                         'priority' => $ticket['priority'] ?? null,
                         'category' => $ticket['category'] ?? null,
                         'source' => $ticket['source'] ?? null,
+                        'comments' => $comments,
                     ];
 
-                    $metadataJson = $metadata ? json_encode(array_filter($metadata, fn ($value) => ! is_null($value))) : null;
+                    $metadataJson = $metadata ? json_encode(array_filter($metadata, fn ($value) => ! is_null($value) && $value !== [])) : null;
 
                     $records[] = [
                         'ticket_id' => (string) $ticketId,
@@ -240,14 +255,14 @@ class SyncTickets extends Command
             }
 
             $text = $comment['text'];
-            
+
             // Look for status change to closed
-            if ((stripos($text, 'Status changed') !== false || stripos($text, 'status changed') !== false) 
+            if ((stripos($text, 'Status changed') !== false || stripos($text, 'status changed') !== false)
                 && stripos($text, 'closed') !== false) {
-                
+
                 // Try updatedAt first, then createdAt
                 $timestamp = $comment['updatedAt'] ?? $comment['createdAt'] ?? null;
-                
+
                 if ($timestamp) {
                     try {
                         return Carbon::parse($timestamp);

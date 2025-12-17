@@ -104,6 +104,7 @@ class TicketDashboard extends Component
             if ($hours === null) {
                 return null;
             }
+
             return number_format($hours, 1).' hours';
         } catch (\Exception $e) {
             return null;

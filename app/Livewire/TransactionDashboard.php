@@ -343,7 +343,7 @@ class TransactionDashboard extends Component
             $chartData = $firstData->chart_data;
             if (isset($chartData['labels'])) {
                 $labels = array_map(function ($date) {
-                    return \Carbon\Carbon::parse($date)->format('M d');
+                    return Carbon::parse($date)->format('M d');
                 }, $chartData['labels']);
             }
         }

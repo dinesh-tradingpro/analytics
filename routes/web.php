@@ -25,6 +25,10 @@ Route::view('tickets', 'tickets')
     ->middleware(['auth', 'verified', 'check.authorized.access'])
     ->name('tickets');
 
+Route::view('managers', 'managers')
+    ->middleware(['auth', 'verified', 'check.authorized.access'])
+    ->name('managers');
+
 Route::middleware(['auth', 'check.authorized.access'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
