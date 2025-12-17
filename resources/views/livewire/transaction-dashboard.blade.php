@@ -464,16 +464,22 @@
             </div>
 
             <!-- Top Transactions Insights -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" wire:loading.class="opacity-50 pointer-events-none" wire:target="dateRange,topLimit">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" wire:loading.class="opacity-50 pointer-events-none"
+                wire:target="dateRange,topLimit">
                 <!-- Top Deposits -->
                 <div
                     class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                     <!-- Loading Overlay -->
-                    <div wire:loading wire:target="dateRange,topLimit" class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-xl flex items-center justify-center z-10">
+                    <div wire:loading wire:target="dateRange,topLimit"
+                        class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-xl flex items-center justify-center z-10">
                         <div class="flex flex-col items-center">
-                            <svg class="animate-spin h-8 w-8 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <svg class="animate-spin h-8 w-8 text-green-600" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
                             </svg>
                             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Loading...</p>
                         </div>
@@ -527,11 +533,16 @@
                 <div
                     class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                     <!-- Loading Overlay -->
-                    <div wire:loading wire:target="dateRange,topLimit" class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-xl flex items-center justify-center z-10">
+                    <div wire:loading wire:target="dateRange,topLimit"
+                        class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-xl flex items-center justify-center z-10">
                         <div class="flex flex-col items-center">
-                            <svg class="animate-spin h-8 w-8 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <svg class="animate-spin h-8 w-8 text-red-600" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
                             </svg>
                             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Loading...</p>
                         </div>
@@ -583,16 +594,22 @@
             </div>
 
             <!-- Repeat Transaction Users -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" wire:loading.class="opacity-50 pointer-events-none" wire:target="dateRange,topLimit">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" wire:loading.class="opacity-50 pointer-events-none"
+                wire:target="dateRange,topLimit">
                 <!-- Repeat Deposit Users -->
                 <div
                     class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                     <!-- Loading Overlay -->
-                    <div wire:loading wire:target="dateRange,topLimit" class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-xl flex items-center justify-center z-10">
+                    <div wire:loading wire:target="dateRange,topLimit"
+                        class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-xl flex items-center justify-center z-10">
                         <div class="flex flex-col items-center">
-                            <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
                             </svg>
                             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Loading...</p>
                         </div>
@@ -658,11 +675,16 @@
                 <div
                     class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                     <!-- Loading Overlay -->
-                    <div wire:loading wire:target="dateRange,topLimit" class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-xl flex items-center justify-center z-10">
+                    <div wire:loading wire:target="dateRange,topLimit"
+                        class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 rounded-xl flex items-center justify-center z-10">
                         <div class="flex flex-col items-center">
-                            <svg class="animate-spin h-8 w-8 text-orange-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <svg class="animate-spin h-8 w-8 text-orange-600" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
                             </svg>
                             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Loading...</p>
                         </div>
@@ -786,7 +808,8 @@
                     <div
                         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Transaction Distribution</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Transaction Distribution
+                            </h3>
                             <div class="text-xs text-gray-500 dark:text-gray-400">All Time</div>
                         </div>
                         <div class="h-80 mb-4" wire:ignore>
@@ -795,11 +818,13 @@
                         <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                             <div class="text-center">
                                 <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Total Transactions</div>
-                                <div class="text-xl font-bold text-gray-900 dark:text-white" id="totalTransactions">-</div>
+                                <div class="text-xl font-bold text-gray-900 dark:text-white" id="totalTransactions">-
+                                </div>
                             </div>
                             <div class="text-center">
                                 <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Most Common</div>
-                                <div class="text-sm font-semibold text-gray-900 dark:text-white" id="mostCommonType">-</div>
+                                <div class="text-sm font-semibold text-gray-900 dark:text-white" id="mostCommonType">-
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -822,7 +847,8 @@
                                     {{ number_format($this->successRates['deposit_success_rate'], 1) }}%
                                 </div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    {{ number_format($this->successRates['deposit_approved']) }} / {{ number_format($this->successRates['deposit_total']) }}
+                                    {{ number_format($this->successRates['deposit_approved']) }} /
+                                    {{ number_format($this->successRates['deposit_total']) }}
                                 </div>
                             </div>
                             <div class="text-center">
@@ -831,7 +857,8 @@
                                     {{ number_format($this->successRates['withdrawal_success_rate'], 1) }}%
                                 </div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    {{ number_format($this->successRates['withdrawal_approved']) }} / {{ number_format($this->successRates['withdrawal_total']) }}
+                                    {{ number_format($this->successRates['withdrawal_approved']) }} /
+                                    {{ number_format($this->successRates['withdrawal_total']) }}
                                 </div>
                             </div>
                             <div class="text-center">
@@ -840,7 +867,8 @@
                                     {{ number_format($this->successRates['overall_success_rate'], 1) }}%
                                 </div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    {{ number_format($this->successRates['overall_approved']) }} / {{ number_format($this->successRates['overall_total']) }}
+                                    {{ number_format($this->successRates['overall_approved']) }} /
+                                    {{ number_format($this->successRates['overall_total']) }}
                                 </div>
                             </div>
                         </div>
@@ -882,14 +910,14 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                                                            {{ $transaction['type'] === 'deposit' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
+                                                                                    {{ $transaction['type'] === 'deposit' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
                                                     {{ ucfirst($transaction['type']) }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                                                            {{ $transaction['status'] === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+                                                                                    {{ $transaction['status'] === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
                                                     {{ ucfirst($transaction['status']) }}
                                                 </span>
                                             </td>
@@ -1265,7 +1293,7 @@
                                             size: 12,
                                             weight: '500'
                                         },
-                                        generateLabels: function(chart) {
+                                        generateLabels: function (chart) {
                                             const data = chart.data;
                                             const isDark = document.documentElement.classList.contains('dark');
                                             return data.labels.map((label, i) => {
@@ -1291,7 +1319,7 @@
                                     padding: 12,
                                     displayColors: true,
                                     callbacks: {
-                                        label: function(context) {
+                                        label: function (context) {
                                             const label = context.label || '';
                                             const value = context.parsed || 0;
                                             const percentage = ((value / total) * 100).toFixed(2);
@@ -1372,11 +1400,11 @@
                                     padding: 12,
                                     displayColors: false,
                                     callbacks: {
-                                        label: function(context) {
+                                        label: function (context) {
                                             const rate = context.parsed.y.toFixed(2);
                                             let type = context.label;
                                             let approved, total;
-                                            
+
                                             if (type === 'Deposits') {
                                                 approved = successRates.deposit_approved;
                                                 total = successRates.deposit_total;
@@ -1387,9 +1415,9 @@
                                                 approved = successRates.overall_approved;
                                                 total = successRates.overall_total;
                                             }
-                                            
+
                                             const performance = rate >= 85 ? 'Excellent' : rate >= 70 ? 'Good' : rate >= 50 ? 'Fair' : 'Needs Improvement';
-                                            
+
                                             return [
                                                 `Success Rate: ${rate}%`,
                                                 `Approved: ${approved.toLocaleString()}`,

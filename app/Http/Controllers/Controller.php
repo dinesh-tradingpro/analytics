@@ -22,7 +22,8 @@ abstract class Controller
 
         try {
             $client = new \GuzzleHttp\Client([
-                'timeout' => 300, // 5 minutes
+                'timeout' => 600, // Allow slower API responses
+                'connect_timeout' => 60,
                 'verify' => true,
             ]);
 

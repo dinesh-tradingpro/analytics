@@ -21,6 +21,10 @@ Route::view('transactions', 'transactions')
     ->middleware(['auth', 'verified', 'check.authorized.access'])
     ->name('transactions');
 
+Route::view('tickets', 'tickets')
+    ->middleware(['auth', 'verified', 'check.authorized.access'])
+    ->name('tickets');
+
 Route::middleware(['auth', 'check.authorized.access'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

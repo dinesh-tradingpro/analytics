@@ -77,14 +77,13 @@
             <p class="text-gray-600 dark:text-gray-300 mb-6">
                 Track customer support requests, response times, and resolution metrics to improve service quality.
             </p>
-            <button
-                class="inline-flex items-center px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 rounded-lg font-medium cursor-not-allowed">
-                Coming Soon
+            <a href="{{ route('tickets') }}"
+                class="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors duration-200">
+                View Tickets
                 <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
-            </button>
+            </a>
         </div>
 
         <!-- Client Engagement Card -->

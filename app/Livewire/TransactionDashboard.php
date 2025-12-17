@@ -185,7 +185,7 @@ class TransactionDashboard extends Component
         $depositDeclined = $this->depositsDeclined->total_count ?? 0;
         $withdrawalApproved = $this->withdrawalsApproved->total_count ?? 0;
         $withdrawalDeclined = $this->withdrawalsDeclined->total_count ?? 0;
-        
+
         $totalDeposits = $depositApproved + $depositDeclined;
         $totalWithdrawals = $withdrawalApproved + $withdrawalDeclined;
         $totalApproved = $depositApproved + $withdrawalApproved;
