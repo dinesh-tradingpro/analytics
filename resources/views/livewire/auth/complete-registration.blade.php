@@ -1,9 +1,6 @@
 <x-layouts.auth>
     <div class="flex flex-col gap-6">
-        <x-auth-header
-            :title="__('Complete Your Registration')"
-            :description="__('Your email is authorized. Please set up your account by providing your name and password.')"
-        />
+        <x-auth-header :title="__('Complete Your Registration')" :description="__('Your email is authorized. Please set up your account by providing your name and password.')" />
 
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
@@ -13,7 +10,9 @@
                 <div class="flex">
                     <div class="flex-shrink-0">
                         <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clip-rule="evenodd" />
                         </svg>
                     </div>
                     <div class="ml-3">
@@ -29,29 +28,15 @@
             @csrf
 
             <!-- Email (read-only) -->
-            <flux:input 
-                name="email" 
-                :label="__('Email address')" 
-                type="email" 
-                value="{{ session('registration_email') }}"
-                readonly
-                disabled
-            />
-            
+            <flux:input name="email" :label="__('Email address')" type="email"
+                value="{{ session('registration_email') }}" readonly disabled />
+
             <input type="hidden" name="email" value="{{ session('registration_email') }}" />
 
             <!-- Full Name -->
             <div>
-                <flux:input 
-                    name="name" 
-                    :label="__('Full Name')" 
-                    type="text" 
-                    required 
-                    autofocus
-                    autocomplete="name" 
-                    placeholder="John Doe"
-                    :value="old('name')"
-                />
+                <flux:input name="name" :label="__('Full Name')" type="text" required autofocus autocomplete="name"
+                    placeholder="John Doe" :value="old('name')" />
                 @error('name')
                     <flux:text color="red" class="mt-1 text-sm">
                         {{ $message }}
@@ -61,15 +46,8 @@
 
             <!-- Password -->
             <div>
-                <flux:input 
-                    name="password" 
-                    :label="__('Password')" 
-                    type="password" 
-                    required
-                    autocomplete="new-password" 
-                    :placeholder="__('Password')"
-                    viewable
-                />
+                <flux:input name="password" :label="__('Password')" type="password" required autocomplete="new-password"
+                    :placeholder="__('Password')" viewable />
                 @error('password')
                     <flux:text color="red" class="mt-1 text-sm">
                         {{ $message }}
@@ -79,15 +57,8 @@
 
             <!-- Confirm Password -->
             <div>
-                <flux:input 
-                    name="password_confirmation" 
-                    :label="__('Confirm Password')" 
-                    type="password" 
-                    required
-                    autocomplete="new-password" 
-                    :placeholder="__('Confirm Password')"
-                    viewable
-                />
+                <flux:input name="password_confirmation" :label="__('Confirm Password')" type="password" required
+                    autocomplete="new-password" :placeholder="__('Confirm Password')" viewable />
                 @error('password_confirmation')
                     <flux:text color="red" class="mt-1 text-sm">
                         {{ $message }}

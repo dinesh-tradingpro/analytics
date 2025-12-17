@@ -51,6 +51,7 @@ class FortifyServiceProvider extends ServiceProvider
             if (request()->has('clear')) {
                 session()->forget('login_email');
             }
+
             return view('livewire.auth.login');
         });
         Fortify::verifyEmailView(fn () => view('livewire.auth.verify-email'));
@@ -92,6 +93,7 @@ class FortifyServiceProvider extends ServiceProvider
             if ($user && \Illuminate\Support\Facades\Hash::check($password, $user->password)) {
                 // Clear login email from session on successful login
                 $request->session()->forget('login_email');
+
                 return $user;
             }
 

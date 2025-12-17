@@ -20,7 +20,7 @@ class CompleteRegistrationController extends Controller
     public function show()
     {
         // Check if registration email is in session
-        if (!session()->has('registration_email')) {
+        if (! session()->has('registration_email')) {
             return redirect()->route('login');
         }
 
@@ -47,7 +47,7 @@ class CompleteRegistrationController extends Controller
         }
 
         // Verify email is authorized
-        if (!AuthorizedEmail::isAuthorized($validated['email'])) {
+        if (! AuthorizedEmail::isAuthorized($validated['email'])) {
             throw ValidationException::withMessages([
                 'email' => ['This email is not authorized to register.'],
             ]);

@@ -15,7 +15,7 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Route::post('login/check-email', [LoginController::class, 'checkEmail'])
         ->name('login.check-email');
-    
+
     Route::get('complete-registration', [CompleteRegistrationController::class, 'show'])
         ->name('complete-registration');
     Route::post('complete-registration', [CompleteRegistrationController::class, 'store'])

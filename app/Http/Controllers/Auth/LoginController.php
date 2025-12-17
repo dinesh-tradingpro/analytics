@@ -27,6 +27,7 @@ class LoginController extends Controller
         if ($user) {
             // User exists, proceed to password step
             $request->session()->put('login_email', $email);
+
             return redirect()->route('login');
         }
 
@@ -34,6 +35,7 @@ class LoginController extends Controller
         if (AuthorizedEmail::isAuthorized($email)) {
             // Email is authorized, redirect to complete registration
             $request->session()->put('registration_email', $email);
+
             return redirect()->route('complete-registration');
         }
 
@@ -49,6 +51,7 @@ class LoginController extends Controller
     public function clearEmail(Request $request)
     {
         $request->session()->forget('login_email');
+
         return redirect()->route('login');
     }
 }
