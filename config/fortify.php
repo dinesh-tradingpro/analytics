@@ -144,7 +144,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // Disabled - users are created via authorized emails page
         Features::resetPasswords(),
         Features::emailVerification(),
         // Features::updateProfileInformation(),

@@ -6,6 +6,8 @@
 <head>
     @include('partials.head')
 
+    @livewireStyles
+
     <!-- Theme initialization script - runs immediately to prevent flash -->
     <script>
         (function () {
@@ -81,6 +83,8 @@
             });
         });
     </script>
+
+    @livewireScripts
 </body>
 
 </html>

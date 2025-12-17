@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\CompleteRegistrationController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\MarketingController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -8,6 +10,17 @@ use Livewire\Volt\Volt;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// Login email check route
+Route::middleware('guest')->group(function () {
+    Route::post('login/check-email', [LoginController::class, 'checkEmail'])
+        ->name('login.check-email');
+    
+    Route::get('complete-registration', [CompleteRegistrationController::class, 'show'])
+        ->name('complete-registration');
+    Route::post('complete-registration', [CompleteRegistrationController::class, 'store'])
+        ->name('complete-registration.store');
+});
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified', 'check.authorized.access'])
@@ -38,7 +51,9 @@ Route::middleware(['auth', 'check.authorized.access'])->group(function () {
         ->middleware('can:manage-authorized-emails')
         ->name('authorized-emails.edit');
 
-    Volt::route('settings/two-factor', 'settings.two-factor')
+    Route::get('settings/two-factor', function () {
+        return view('settings.two-factor');
+    })
         ->middleware(
             when(
                 Features::canManageTwoFactorAuthentication()

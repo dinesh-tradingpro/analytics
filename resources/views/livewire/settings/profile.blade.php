@@ -113,8 +113,6 @@ new #[Layout('components.layouts.modern', ['current' => 'settings'])] class exte
                     </x-action-message>
                 </div>
             </form>
-
-            <livewire:settings.delete-user-form />
         </x-settings.layout>
     </section>
 </div>
