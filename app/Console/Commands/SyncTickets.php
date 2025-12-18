@@ -35,7 +35,7 @@ class SyncTickets extends Command
         $this->info('🔄 Starting ticket sync...');
 
         $startTime = now();
-        // Defaults when no arguments are provided: both open/closed, batch size 1000
+        // Defaults when no arguments are provided: batch size 1000
         $batchSize = (int) $this->option('batch-size');
         if ($batchSize <= 0) {
             $batchSize = 1000;
@@ -43,12 +43,11 @@ class SyncTickets extends Command
         $batchSize = max(1, $batchSize);
 
         $statuses = $this->option('statuses');
-        if (empty($statuses)) {
-            $statuses = ['open', 'closed'];
-        }
-        $statuses = array_values(array_unique(array_filter(array_map('strtolower', $statuses))));
-        if (empty($statuses)) {
-            $statuses = ['open', 'closed'];
+        // Only filter/sanitize if statuses were explicitly provided
+        $useStatuses = ! empty($statuses);
+        if ($useStatuses) {
+            $statuses = array_values(array_unique(array_filter(array_map('strtolower', $statuses))));
+            $useStatuses = ! empty($statuses);
         }
 
         $controller = new class extends Controller
@@ -69,7 +68,6 @@ class SyncTickets extends Command
                 $this->info("📥 Fetching tickets offset {$offset} (batch {$batchSize})...");
 
                 $payload = [
-                    'statuses' => $statuses,
                     'withComments' => true,
                     'orders' => [
                         [
@@ -82,6 +80,11 @@ class SyncTickets extends Command
                         'offset' => $offset,
                     ],
                 ];
+
+                // Only include statuses if explicitly provided
+                if ($useStatuses) {
+                    $payload['statuses'] = $statuses;
+                }
 
                 $response = $controller->callApiEndpointSingle('help-desk/tickets', $payload, 'POST');
 
