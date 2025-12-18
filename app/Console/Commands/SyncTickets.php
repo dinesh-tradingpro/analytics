@@ -35,9 +35,18 @@ class SyncTickets extends Command
         $this->info('🔄 Starting ticket sync...');
 
         $startTime = now();
-        $batchSize = max(1, (int) $this->option('batch-size'));
+        // Defaults when no arguments are provided: both open/closed, batch size 1000
+        $batchSize = (int) $this->option('batch-size');
+        if ($batchSize <= 0) {
+            $batchSize = 1000;
+        }
+        $batchSize = max(1, $batchSize);
+
         $statuses = $this->option('statuses');
-        $statuses = array_filter(array_map('strtolower', $statuses ?: ['open', 'closed']));
+        if (empty($statuses)) {
+            $statuses = ['open', 'closed'];
+        }
+        $statuses = array_values(array_unique(array_filter(array_map('strtolower', $statuses))));
         if (empty($statuses)) {
             $statuses = ['open', 'closed'];
         }
