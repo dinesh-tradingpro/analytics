@@ -111,8 +111,8 @@ class TransactionDashboard extends Component
                 // Get real transaction data from TransactionDetail model
                 $depositApproved = TransactionDetail::selectRaw('
                     COUNT(*) as count,
-                    SUM(processed_amount) as total_amount,
-                    AVG(processed_amount) as avg_amount
+                    SUM(processed_amount_usd) as total_amount,
+                    AVG(processed_amount_usd) as avg_amount
                 ')
                     ->where('transaction_type', 'deposit')
                     ->where('status', 'approved')
@@ -120,19 +120,19 @@ class TransactionDashboard extends Component
 
                 $withdrawalApproved = TransactionDetail::selectRaw('
                     COUNT(*) as count,
-                    SUM(processed_amount) as total_amount,
-                    AVG(processed_amount) as avg_amount
+                    SUM(processed_amount_usd) as total_amount,
+                    AVG(processed_amount_usd) as avg_amount
                 ')
                     ->where('transaction_type', 'withdrawal')
                     ->where('status', 'approved')
                     ->first();
 
-                $depositDeclined = TransactionDetail::selectRaw('COUNT(*) as count')
+                $depositDeclined = TransactionDetail::selectRaw('COUNT(*) as count, SUM(processed_amount_usd) as total_amount')
                     ->where('transaction_type', 'deposit')
                     ->where('status', 'declined')
                     ->first();
 
-                $withdrawalDeclined = TransactionDetail::selectRaw('COUNT(*) as count')
+                $withdrawalDeclined = TransactionDetail::selectRaw('COUNT(*) as count, SUM(processed_amount_usd) as total_amount')
                     ->where('transaction_type', 'withdrawal')
                     ->where('status', 'declined')
                     ->first();

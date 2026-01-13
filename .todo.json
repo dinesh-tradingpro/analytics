@@ -1,0 +1,29 @@
+{
+    "todos": [
+        {
+            "id": 1,
+            "title": "Update Livewire views to show USD labels",
+            "status": "done"
+        },
+        {
+            "id": 2,
+            "title": "Add Artisan command `currency:update-rates` to fetch latest rates",
+            "status": "done"
+        },
+        {
+            "id": 3,
+            "title": "Run the rates update command and verify config",
+            "status": "done"
+        },
+        {
+            "id": 4,
+            "title": "Clear config cache and restart services if needed",
+            "status": "done"
+        },
+        {
+            "id": 5,
+            "title": "Verify dashboard charts show USD and correct counts",
+            "status": "done"
+        }
+    ]
+}

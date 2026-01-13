@@ -163,6 +163,7 @@
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Deposit Volume</p>
                             <p class="text-2xl font-bold text-gray-900 dark:text-white">
                                 ${{ number_format($this->transactionStats['deposit_approved']->total_amount ?? 0, 2) }}
+                                USD
                             </p>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                 {{ number_format($this->transactionStats['deposit_approved']->count ?? 0) }}
@@ -188,6 +189,7 @@
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Withdrawal Volume</p>
                             <p class="text-2xl font-bold text-gray-900 dark:text-white">
                                 ${{ number_format($this->transactionStats['withdrawal_approved']->total_amount ?? 0, 2) }}
+                                USD
                             </p>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                 {{ number_format($this->transactionStats['withdrawal_approved']->count ?? 0) }}
@@ -251,7 +253,7 @@
                             @endphp
                             <p
                                 class="text-2xl font-bold {{ $netFlow >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                ${{ number_format($netFlow, 2) }}
+                                ${{ number_format($netFlow, 2) }} USD
                             </p>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                 {{ $netFlow >= 0 ? 'Positive' : 'Negative' }} flow
@@ -307,7 +309,7 @@
                         <div>
                             <p class="text-sm font-medium text-indigo-700 dark:text-indigo-300">Total Volume</p>
                             <p class="text-2xl font-bold text-indigo-900 dark:text-white mt-1">
-                                ${{ number_format($this->transactionStats['total_approved_amount'], 2) }}
+                                ${{ number_format($this->transactionStats['total_approved_amount'], 2) }} USD
                             </p>
                             <p class="text-sm text-indigo-600 dark:text-indigo-400 mt-1">
                                 Approved amount
@@ -336,7 +338,7 @@
                                 $avgAmount = $totalCount > 0 ? $totalAmount / $totalCount : 0;
                             @endphp
                             <p class="text-2xl font-bold text-orange-900 dark:text-white mt-1">
-                                ${{ number_format($avgAmount, 2) }}
+                                ${{ number_format($avgAmount, 2) }} USD
                             </p>
                             <p class="text-sm text-orange-600 dark:text-orange-400 mt-1">
                                 Per transaction
@@ -510,8 +512,11 @@
                                         {{ $index + 1 }}
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white">User:
-                                            {{ $transaction->from_login_sid }}
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                            User ID: <span class="font-semibold">{{ $transaction->from_user_id }}</span>
+                                        </p>
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                            Wallet ID: <span class="font-semibold">{{ $transaction->from_login_sid }}</span>
                                         </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400">
                                             {{ $transaction->transaction_date->format('M d, Y') }}
@@ -520,7 +525,7 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="text-lg font-bold text-green-600 dark:text-green-400">
-                                        ${{ number_format($transaction->processed_amount, 2) }}</p>
+                                        ${{ number_format($transaction->amount, 2) }}</p>
                                 </div>
                             </div>
                         @empty
@@ -573,8 +578,11 @@
                                         {{ $index + 1 }}
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white">User:
-                                            {{ $transaction->from_login_sid }}
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                            User ID: <span class="font-semibold">{{ $transaction->from_user_id }}</span>
+                                        </p>
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                            Wallet ID: <span class="font-semibold">{{ $transaction->from_login_sid }}</span>
                                         </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400">
                                             {{ $transaction->transaction_date->format('M d, Y') }}
@@ -583,7 +591,7 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="text-lg font-bold text-red-600 dark:text-red-400">
-                                        ${{ number_format($transaction->processed_amount, 2) }}</p>
+                                        ${{ number_format($transaction->amount, 2) }}</p>
                                 </div>
                             </div>
                         @empty
@@ -622,44 +630,44 @@
 
                     <div class="space-y-4">
                         @forelse($this->repeatDepositUsers as $index => $user)
-                            <div
-                                class="p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg border border-green-200 dark:border-green-700">
+                            <div class="p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg border border-green-200 dark:border-green-700 shadow hover:shadow-lg transition-shadow">
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center space-x-3">
-                                        <span
-                                            class="text-2xl font-bold text-green-600 dark:text-green-400">#{{ $index + 1 }}</span>
+                                        <span class="text-2xl font-bold text-green-600 dark:text-green-400">#{{ $index + 1 }}</span>
                                         <div>
-                                            <p class="font-medium text-gray-900 dark:text-white">User:
-                                                {{ $user->from_login_sid }}
+                                            <p class="font-medium text-gray-900 dark:text-white">
+                                                User ID: <span class="font-semibold">{{ $user->from_user_id }}</span>
+                                            </p>
+                                            <p class="font-medium text-gray-900 dark:text-white">
+                                                Wallet ID: <span class="font-semibold">{{ $user->from_login_sid }}</span>
                                             </p>
                                             <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ $user->first_transaction->format('M d') }} -
-                                                {{ $user->last_transaction->format('M d, Y') }}
+                                                {{ $user->first_transaction->format('M d') }} - {{ $user->last_transaction->format('M d, Y') }}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-4 gap-3 text-center">
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Transactions</p>
-                                        <p class="text-xl font-bold text-gray-900 dark:text-white">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Transactions</p>
+                                        <p class="text-lg font-bold text-gray-900 dark:text-white">
                                             {{ $user->transaction_count }}
                                         </p>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Total Amount</p>
-                                        <p class="text-xl font-bold text-green-600 dark:text-green-400">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Total Amount</p>
+                                        <p class="text-lg font-bold text-green-600 dark:text-green-400">
                                             ${{ number_format($user->total_amount, 0) }}</p>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Avg Amount</p>
-                                        <p class="text-xl font-bold text-blue-600 dark:text-blue-400">
-                                            ${{ number_format($user->avg_amount, 0) }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Avg Amount</p>
+                                        <p class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                                            ${{ number_format((float) $user->avg_amount, 0) }}</p>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Avg Time</p>
-                                        <p class="text-xl font-bold text-purple-600 dark:text-purple-400">
-                                            {{ $user->avg_processing_time_seconds ? gmdate('i:s', $user->avg_processing_time_seconds) : 'N/A' }}
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Avg Time</p>
+                                        <p class="text-lg font-bold text-purple-600 dark:text-purple-400">
+                                            {{ $user->avg_processing_time_seconds ? gmdate('i:s', (int) $user->avg_processing_time_seconds) : 'N/A' }}
                                         </p>
                                     </div>
                                 </div>
@@ -698,44 +706,44 @@
 
                     <div class="space-y-4">
                         @forelse($this->repeatWithdrawalUsers as $index => $user)
-                            <div
-                                class="p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-lg border border-red-200 dark:border-red-700">
+                            <div class="p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-lg border border-red-200 dark:border-red-700 shadow hover:shadow-lg transition-shadow">
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center space-x-3">
-                                        <span
-                                            class="text-2xl font-bold text-red-600 dark:text-red-400">#{{ $index + 1 }}</span>
+                                        <span class="text-2xl font-bold text-red-600 dark:text-red-400">#{{ $index + 1 }}</span>
                                         <div>
-                                            <p class="font-medium text-gray-900 dark:text-white">User:
-                                                {{ $user->from_login_sid }}
+                                            <p class="font-medium text-gray-900 dark:text-white">
+                                                User ID: <span class="font-semibold">{{ $user->from_user_id }}</span>
+                                            </p>
+                                            <p class="font-medium text-gray-900 dark:text-white">
+                                                Wallet ID: <span class="font-semibold">{{ $user->from_login_sid }}</span>
                                             </p>
                                             <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ $user->first_transaction->format('M d') }} -
-                                                {{ $user->last_transaction->format('M d, Y') }}
+                                                {{ $user->first_transaction->format('M d') }} - {{ $user->last_transaction->format('M d, Y') }}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-4 gap-3 text-center">
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Transactions</p>
-                                        <p class="text-xl font-bold text-gray-900 dark:text-white">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Transactions</p>
+                                        <p class="text-lg font-bold text-gray-900 dark:text-white">
                                             {{ $user->transaction_count }}
                                         </p>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Total Amount</p>
-                                        <p class="text-xl font-bold text-red-600 dark:text-red-400">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Total Amount</p>
+                                        <p class="text-lg font-bold text-red-600 dark:text-red-400">
                                             ${{ number_format($user->total_amount, 0) }}</p>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Avg Amount</p>
-                                        <p class="text-xl font-bold text-orange-600 dark:text-orange-400">
-                                            ${{ number_format($user->avg_amount, 0) }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Avg Amount</p>
+                                        <p class="text-lg font-bold text-orange-600 dark:text-orange-400">
+                                            ${{ number_format((float) $user->avg_amount, 0) }}</p>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Avg Time</p>
-                                        <p class="text-xl font-bold text-purple-600 dark:text-purple-400">
-                                            {{ $user->avg_processing_time_seconds ? gmdate('i:s', $user->avg_processing_time_seconds) : 'N/A' }}
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Avg Time</p>
+                                        <p class="text-lg font-bold text-purple-600 dark:text-purple-400">
+                                            {{ $user->avg_processing_time_seconds ? gmdate('i:s', (int) $user->avg_processing_time_seconds) : 'N/A' }}
                                         </p>
                                     </div>
                                 </div>
@@ -884,50 +892,31 @@
                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            User ID</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Type</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Status</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Amount</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Date</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User ID</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Wallet ID</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     @foreach ($this->topTransactionsList as $transaction)
                                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                {{ $transaction['user_id'] ?? 'N/A' }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                                                                    {{ $transaction['type'] === 'deposit' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $transaction['user_id'] ?? 'N/A' }}</td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $transaction['wallet_id'] ?? ($transaction['from_login_sid'] ?? 'N/A') }}</td>
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $transaction['type'] === 'deposit' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
                                                     {{ ucfirst($transaction['type']) }}
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                                                                    {{ $transaction['status'] === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $transaction['status'] === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
                                                     {{ ucfirst($transaction['status']) }}
                                                 </span>
                                             </td>
-                                            <td
-                                                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                ${{ number_format($transaction['amount'] ?? 0, 2) }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                {{ isset($transaction['created_at']) ? \Carbon\Carbon::parse($transaction['created_at'])->format('M d, Y H:i') : 'N/A' }}
-                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">${{ number_format($transaction['amount'] ?? 0, 2) }}</td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ isset($transaction['created_at']) ? \Carbon\Carbon::parse($transaction['created_at'])->format('M d, Y H:i') : 'N/A' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
