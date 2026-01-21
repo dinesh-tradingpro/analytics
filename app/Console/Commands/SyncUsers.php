@@ -65,16 +65,20 @@ class SyncUsers extends Command
     private function syncActiveUsers($controller)
     {
         $this->info('📊 Syncing active users data (daily snapshot: firstDepositDate not null + lastLoginDate = today)...');
+        \Log::debug('SyncUsers: Starting active users sync');
 
         $today = date('Y-m-d');
+        \Log::debug('SyncUsers: Today is '.$today);
 
         // Check if today's snapshot already exists
         $existingCache = UserAnalyticsCache::where('metric_type', 'active_users_daily')
             ->whereDate('data_date', $today)
             ->first();
+        \Log::debug('SyncUsers: Existing cache for today', ['cache' => $existingCache]);
 
         if ($existingCache && ! $this->option('force')) {
             $this->info("⏭️  Today's active users snapshot already exists (count: {$existingCache->total_count}), skipping...");
+            \Log::debug('SyncUsers: Skipping, cache exists and not forced', ['count' => $existingCache->total_count]);
 
             return;
         }
@@ -84,9 +88,11 @@ class SyncUsers extends Command
         $offset = 0;
         $batchSize = 2000;
         $hasMoreData = true;
+        \Log::debug('SyncUsers: Starting batch loop');
 
         while ($hasMoreData) {
             $this->info("📥 Fetching batch at offset {$offset}...");
+            \Log::debug('SyncUsers: Fetching batch', ['offset' => $offset]);
 
             $response = $controller->callApiEndpointSingle('users?version=1.0.0', [
                 'segment' => [
@@ -96,15 +102,16 @@ class SyncUsers extends Command
             ], 'POST');
 
             if (! $response['success']) {
+                \Log::error('SyncUsers: Failed to fetch users data', ['error' => $response['error']]);
                 throw new \Exception('Failed to fetch users data: '.$response['error']);
             }
 
             $batchData = $response['data'] ?? [];
             $batchCount = count($batchData);
             $totalFetched += $batchCount;
+            \Log::debug('SyncUsers: Processing batch', ['batchCount' => $batchCount]);
 
-            $this->info("📊 Processing {$batchCount} records...");
-
+            $activeInBatch = 0;
             foreach ($batchData as $user) {
                 // Only process users with firstDepositDate
                 if (empty($user['firstDepositDate'])) {
@@ -116,9 +123,11 @@ class SyncUsers extends Command
                     $lastLoginDate = date('Y-m-d', strtotime($user['lastLoginDate']));
                     if ($lastLoginDate === $today) {
                         $totalActiveUsers++;
+                        $activeInBatch++;
                     }
                 }
             }
+            \Log::debug('SyncUsers: Active users in batch', ['activeInBatch' => $activeInBatch, 'offset' => $offset]);
 
             unset($batchData);
             gc_collect_cycles();
@@ -131,6 +140,7 @@ class SyncUsers extends Command
         }
 
         $this->info("🔍 Found {$totalActiveUsers} active users from {$totalFetched} total records");
+        \Log::debug('SyncUsers: Final active users count', ['totalActiveUsers' => $totalActiveUsers, 'totalFetched' => $totalFetched]);
 
         // Store today's snapshot - this will preserve previous days' records
         UserAnalyticsCache::updateOrCreate(
